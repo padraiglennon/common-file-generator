@@ -1,0 +1,25 @@
+{
+  "text": {
+    "title": "Q3 Business Review",
+    "subtitle": "Prepared for the leadership team",
+    "author": "A. Non"
+  },
+  "tables": [
+    {
+      "name": "RevenueTable",
+      "header": ["Region", "Q2", "Q3", "Change"],
+      "rows": [
+        ["North", "120", "138", "+15%"],
+        ["South", "98", "101", "+3%"],
+        ["East", "76", "90", "+18%"],
+        ["West", "110", "104", "-5%"]
+      ]
+    }
+  ],
+  "media": [
+    {
+      "name": "Logo",
+      "path": "../assets/sample-logo.png"
+    }
+  ]
+}

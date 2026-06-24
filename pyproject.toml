@@ -1,0 +1,56 @@
+[project]
+name = "ms-office-file-generator"
+version = "0.1.0"
+description = "Template-driven generator for test MS Office files (PPTX/DOCX/XLSX) via Golden-file data injection"
+readme = "README.md"
+requires-python = ">=3.14"
+license = { file = "LICENSE" }
+dependencies = [
+    "python-pptx>=1.0.2",
+    "python-docx>=1.1.2",
+    "openpyxl>=3.1.5",
+]
+
+[project.scripts]
+generate = "ms_office_file_generator.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "ruff>=0.12.0",
+    "pre-commit>=4.0.0",
+    "pillow>=10.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ms_office_file_generator"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ms_office_file_generator"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+pythonpath = ["src"]

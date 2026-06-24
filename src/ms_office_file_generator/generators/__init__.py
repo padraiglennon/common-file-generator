@@ -1,0 +1,9 @@
+"""Generate mode: build complex Office files from scratch (not template-driven).
+
+Where injectors fill a Golden template, generators *create* a document at a
+chosen complexity level - the common "give me an N-slide complex deck" case.
+"""
+
+from ms_office_file_generator.generators.pptx import PptxComplexityGenerator
+
+__all__ = ["PptxComplexityGenerator"]
