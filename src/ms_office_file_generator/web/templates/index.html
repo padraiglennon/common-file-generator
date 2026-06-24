@@ -10,7 +10,7 @@
 <body>
   <header>
     <h1>Office file generator</h1>
-    <p>Create test PowerPoint, Word, and Excel files - no command line needed.</p>
+    <p>Create test PowerPoint, Word, Excel, PDF, and Markdown files - no command line needed.</p>
   </header>
 
   <main>
@@ -24,6 +24,12 @@
       <button type="button" class="tab" id="tab-sheet"
         role="tab" aria-selected="false"
         onclick="showPanel('sheet')">Generate a spreadsheet</button>
+      <button type="button" class="tab" id="tab-pdf"
+        role="tab" aria-selected="false"
+        onclick="showPanel('pdf')">Generate a PDF</button>
+      <button type="button" class="tab" id="tab-md"
+        role="tab" aria-selected="false"
+        onclick="showPanel('md')">Generate Markdown</button>
       <button type="button" class="tab" id="tab-fill"
         role="tab" aria-selected="false"
         onclick="showPanel('fill')">Use a template</button>
@@ -123,6 +129,60 @@
       <div id="sheet-result" class="result"></div>
     </section>
 
+    <section class="card panel" id="panel-pdf" role="tabpanel" hidden>
+      <h2>Generate a PDF</h2>
+      <p class="hint">Build a PDF document from scratch at a chosen complexity.</p>
+      <form hx-post="/generate/pdf" hx-target="#pdf-result" hx-swap="innerHTML">
+        {% for field in pdf_fields %}
+        <label>
+          <span class="field-label">
+            {{ field.label }}
+            <span class="tip" tabindex="0" data-tip="{{ field.help }}"
+              aria-label="{{ field.help }}">?</span>
+          </span>
+          {% if field.kind == "select" %}
+          <select name="{{ field.name }}">
+            {% for choice in field.choices %}
+            <option value="{{ choice.value }}"{% if choice.value == field.default %} selected{% endif %}>{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="number" name="{{ field.name }}" value="{{ field.default }}">
+          {% endif %}
+        </label>
+        {% endfor %}
+        <button type="submit">Generate PDF</button>
+      </form>
+      <div id="pdf-result" class="result"></div>
+    </section>
+
+    <section class="card panel" id="panel-md" role="tabpanel" hidden>
+      <h2>Generate Markdown</h2>
+      <p class="hint">Build a Markdown document from scratch at a chosen complexity.</p>
+      <form hx-post="/generate/md" hx-target="#md-result" hx-swap="innerHTML">
+        {% for field in md_fields %}
+        <label>
+          <span class="field-label">
+            {{ field.label }}
+            <span class="tip" tabindex="0" data-tip="{{ field.help }}"
+              aria-label="{{ field.help }}">?</span>
+          </span>
+          {% if field.kind == "select" %}
+          <select name="{{ field.name }}">
+            {% for choice in field.choices %}
+            <option value="{{ choice.value }}"{% if choice.value == field.default %} selected{% endif %}>{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="number" name="{{ field.name }}" value="{{ field.default }}">
+          {% endif %}
+        </label>
+        {% endfor %}
+        <button type="submit">Generate Markdown</button>
+      </form>
+      <div id="md-result" class="result"></div>
+    </section>
+
     <section class="card panel" id="panel-fill" role="tabpanel" hidden>
       <h2>Use a template</h2>
       <p class="hint">
@@ -160,7 +220,7 @@
 
   <script>
     function showPanel(which) {
-      for (const name of ["deck", "doc", "sheet", "fill"]) {
+      for (const name of ["deck", "doc", "sheet", "pdf", "md", "fill"]) {
         const active = name === which;
         document.getElementById("panel-" + name).hidden = !active;
         const tab = document.getElementById("tab-" + name);

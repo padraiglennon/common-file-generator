@@ -69,13 +69,23 @@ def test_every_deck_field_has_help_text() -> None:
 
 
 def test_fields_render_tooltips_and_required_markers(client) -> None:
-    from ms_office_file_generator.web.forms import doc_fields, sheet_fields
+    from ms_office_file_generator.web.forms import (
+        doc_fields,
+        md_fields,
+        pdf_fields,
+        sheet_fields,
+    )
 
     html = client.get("/").text
-    # Every field across the deck, document, spreadsheet, and fill forms carries
-    # a hover tooltip marker; help text is in its data-tip attribute.
+    # Every field across the deck, document, spreadsheet, PDF, Markdown, and fill
+    # forms carries a hover tooltip marker; help text is in its data-tip attribute.
     expected = (
-        len(deck_fields()) + len(doc_fields()) + len(sheet_fields()) + 2  # uploads
+        len(deck_fields())
+        + len(doc_fields())
+        + len(sheet_fields())
+        + len(pdf_fields())
+        + len(md_fields())
+        + 2  # fill uploads
     )
     assert html.count('class="tip"') == expected
     assert "How busy each slide is" in html  # plain-language help (data-tip)
@@ -237,6 +247,74 @@ def test_sheet_fields_track_the_core() -> None:
 
     names = {f.name for f in sheet_fields()}
     assert {"complexity", "sheets", "seed"} == names
+
+
+def test_index_has_pdf_tab(client) -> None:
+    html = client.get("/").text
+    assert 'id="tab-pdf"' in html and 'id="panel-pdf"' in html
+    assert "Generate a PDF" in html
+    assert 'hx-post="/generate/pdf"' in html
+
+
+def test_index_has_markdown_tab(client) -> None:
+    html = client.get("/").text
+    assert 'id="tab-md"' in html and 'id="panel-md"' in html
+    assert "Generate Markdown" in html
+    assert 'hx-post="/generate/md"' in html
+
+
+def test_generate_pdf_returns_downloadable_file(client) -> None:
+    resp = client.post(
+        "/generate/pdf",
+        data={"complexity": "complex", "sections": "5", "seed": "2"},
+    )
+    assert resp.status_code == 200
+    download = client.get(f"/download/{_token(resp.text)}")
+    assert download.status_code == 200
+    assert download.content[:4] == b"%PDF"
+
+
+def test_generate_pdf_invalid_sections_errors(client) -> None:
+    resp = client.post(
+        "/generate/pdf",
+        data={"complexity": "standard", "sections": "0", "seed": "0"},
+    )
+    assert resp.status_code == 400
+    assert "Could not generate" in resp.text
+
+
+def test_generate_markdown_returns_downloadable_md(client) -> None:
+    resp = client.post(
+        "/generate/md",
+        data={"complexity": "complex", "sections": "5", "seed": "2"},
+    )
+    assert resp.status_code == 200
+    download = client.get(f"/download/{_token(resp.text)}")
+    assert download.status_code == 200
+    assert download.content.startswith(b"# ")
+
+
+def test_generate_markdown_invalid_sections_errors(client) -> None:
+    resp = client.post(
+        "/generate/md",
+        data={"complexity": "standard", "sections": "0", "seed": "0"},
+    )
+    assert resp.status_code == 400
+    assert "Could not generate" in resp.text
+
+
+def test_pdf_fields_track_the_core() -> None:
+    from ms_office_file_generator.web.forms import pdf_fields
+
+    names = {f.name for f in pdf_fields()}
+    assert {"complexity", "sections", "seed"} == names
+
+
+def test_md_fields_track_the_core() -> None:
+    from ms_office_file_generator.web.forms import md_fields
+
+    names = {f.name for f in md_fields()}
+    assert {"complexity", "sections", "seed"} == names
 
 
 def test_background_control_is_merged(client) -> None:

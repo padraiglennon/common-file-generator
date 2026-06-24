@@ -16,6 +16,8 @@ from ms_office_file_generator.core import (
     Complexity,
     generate_deck,
     generate_doc,
+    generate_markdown,
+    generate_pdf,
     generate_sheet,
 )
 from ms_office_file_generator.generators.background import BackgroundMode
@@ -152,6 +154,20 @@ def doc_fields() -> list[Field]:
 def sheet_fields() -> list[Field]:
     """Return the workbook form fields, derived from ``generate_sheet``."""
     return _fields_from(generate_sheet, _SHEET_FIELD_META)
+
+
+def pdf_fields() -> list[Field]:
+    """Return the PDF form fields, derived from ``generate_pdf``'s signature.
+
+    PDF and Markdown share Word's section/complexity/seed shape, so they reuse
+    ``_DOC_FIELD_META`` rather than duplicate it.
+    """
+    return _fields_from(generate_pdf, _DOC_FIELD_META)
+
+
+def md_fields() -> list[Field]:
+    """Return the Markdown form fields, derived from ``generate_markdown``."""
+    return _fields_from(generate_markdown, _DOC_FIELD_META)
 
 
 def _fields_from(func: object, meta: dict[str, tuple[str, str, str]]) -> list[Field]:

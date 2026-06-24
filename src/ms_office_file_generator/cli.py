@@ -1,13 +1,14 @@
 """Command-line entry point: a thin wrapper over the core library.
 
-Two modes:
+Modes:
 
 * ``fill`` - inject JSON data into a Golden template (template-driven).
-* ``deck`` - generate a complex PowerPoint deck from scratch at a chosen
-  complexity level (generate mode; the common "give me an N-slide deck" case).
+* ``deck`` / ``doc`` / ``sheet`` / ``pdf`` / ``markdown`` - generate a file from
+  scratch at a chosen complexity level (generate mode; the common "give me an
+  N-slide deck / N-section document" case).
 
-All real work lives in the core library so a future UI (see ADR-001) can reuse
-it unchanged.
+All real work lives in the core library so the UI (see ADR-001) can reuse it
+unchanged.
 """
 
 from __future__ import annotations
@@ -24,6 +25,8 @@ from ms_office_file_generator.core import (
     generate,
     generate_deck,
     generate_doc,
+    generate_markdown,
+    generate_pdf,
     generate_sheet,
 )
 
@@ -81,23 +84,23 @@ def build_parser() -> argparse.ArgumentParser:
     deck.add_argument("-v", "--verbose", action="store_true")
     deck.set_defaults(func=_run_deck)
 
-    doc = sub.add_parser("doc", help="Generate a complex Word document from scratch.")
-    doc.add_argument("--out", required=True, type=Path)
-    doc.add_argument(
-        "--complexity",
-        choices=[level.value for level in Complexity],
-        default=Complexity.STANDARD.value,
+    doc = _add_section_parser(
+        sub, "doc", "Generate a complex Word document from scratch."
     )
-    doc.add_argument("--sections", type=int, default=5)
-    doc.add_argument("--seed", type=int, default=0)
-    doc.add_argument(
-        "--blocks-per-section",
-        type=int,
-        default=None,
-        help="Content blocks per section (default scales with complexity).",
-    )
-    doc.add_argument("-v", "--verbose", action="store_true")
     doc.set_defaults(func=_run_doc)
+
+    pdf = _add_section_parser(
+        sub, "pdf", "Generate a complex PDF document from scratch."
+    )
+    pdf.set_defaults(func=_run_pdf)
+
+    markdown = _add_section_parser(
+        sub,
+        "markdown",
+        "Generate a complex Markdown document from scratch.",
+        aliases=["md"],
+    )
+    markdown.set_defaults(func=_run_markdown)
 
     sheet = sub.add_parser(
         "sheet", help="Generate a complex Excel workbook from scratch."
@@ -125,6 +128,37 @@ def build_parser() -> argparse.ArgumentParser:
     sheet.add_argument("-v", "--verbose", action="store_true")
     sheet.set_defaults(func=_run_sheet)
 
+    return parser
+
+
+def _add_section_parser(
+    sub: argparse._SubParsersAction,
+    name: str,
+    help_text: str,
+    *,
+    aliases: list[str] | None = None,
+) -> argparse.ArgumentParser:
+    """Add a section-based generate subparser (out/complexity/sections/seed).
+
+    Word, PDF, and Markdown generate the same way - a series of sections at a
+    chosen complexity - so they share one argument shape.
+    """
+    parser = sub.add_parser(name, help=help_text, aliases=aliases or [])
+    parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument(
+        "--complexity",
+        choices=[level.value for level in Complexity],
+        default=Complexity.STANDARD.value,
+    )
+    parser.add_argument("--sections", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--blocks-per-section",
+        type=int,
+        default=None,
+        help="Content blocks per section (default scales with complexity).",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
 
@@ -178,6 +212,38 @@ def _run_doc(args: argparse.Namespace) -> int:
         )
     except ValueError as exc:
         print(f"Could not generate the document: {exc}", file=sys.stderr)
+        return 2
+    print(f"Created {out} ({args.sections} sections, {args.complexity} complexity).")
+    return 0
+
+
+def _run_pdf(args: argparse.Namespace) -> int:
+    try:
+        out = generate_pdf(
+            str(args.out),
+            complexity=args.complexity,
+            sections=args.sections,
+            seed=args.seed,
+            blocks_per_section=args.blocks_per_section,
+        )
+    except ValueError as exc:
+        print(f"Could not generate the PDF: {exc}", file=sys.stderr)
+        return 2
+    print(f"Created {out} ({args.sections} sections, {args.complexity} complexity).")
+    return 0
+
+
+def _run_markdown(args: argparse.Namespace) -> int:
+    try:
+        out = generate_markdown(
+            str(args.out),
+            complexity=args.complexity,
+            sections=args.sections,
+            seed=args.seed,
+            blocks_per_section=args.blocks_per_section,
+        )
+    except ValueError as exc:
+        print(f"Could not generate the Markdown document: {exc}", file=sys.stderr)
         return 2
     print(f"Created {out} ({args.sections} sections, {args.complexity} complexity).")
     return 0

@@ -1,7 +1,7 @@
 [project]
 name = "ms-office-file-generator"
 version = "0.1.0"
-description = "Template-driven generator for test MS Office files (PPTX/DOCX/XLSX) via Golden-file data injection"
+description = "Generator for test documents (PPTX/DOCX/XLSX/PDF/Markdown) by complexity-driven generation or Golden-file data injection"
 readme = "README.md"
 requires-python = ">=3.14"
 license = { file = "LICENSE" }
@@ -9,6 +9,8 @@ dependencies = [
     "python-pptx>=1.0.2",
     "python-docx>=1.1.2",
     "openpyxl>=3.1.5",
+    "reportlab>=4.0.0",
+    "pillow>=10.0.0",
 ]
 
 [project.optional-dependencies]
@@ -28,8 +30,8 @@ dev = [
     "pytest>=8.3.0",
     "ruff>=0.12.0",
     "pre-commit>=4.0.0",
-    "pillow>=10.0.0",
     "httpx>=0.27.0",
+    "pypdf>=4.0.0",
 ]
 
 [build-system]

@@ -1,7 +1,7 @@
 # ms-office-file-generator
 
-Python tool for producing test MS Office sample files (PowerPoint, Word, Excel)
-for testing purposes.
+Python tool for producing test sample files (PowerPoint, Word, Excel, PDF, and
+Markdown) for testing purposes.
 
 It works in two modes:
 
@@ -115,6 +115,38 @@ complexity decides what each sheet gets:
 `--sheets N` sets the workbook size, `--rows N` overrides the table size, and
 `--seed N` makes the output reproducible. Totals are live formulas
 (`=SUM`/`=AVERAGE`) the spreadsheet app evaluates on open.
+
+### Generate a PDF
+
+```bash
+uv run generate pdf \
+  --out output/document.pdf \
+  --complexity maximum \
+  --sections 20
+```
+
+Builds a `.pdf` from scratch (with `reportlab`). Like the Word generator, each
+**section** is a heading plus a run of content blocks (paragraphs, bullet and
+numbered lists, tables, images, block quotes, page breaks) that grows with
+complexity. `--sections N` sets the length. `--seed N` makes the *content*
+reproducible (the PDF embeds a creation timestamp, so the bytes vary but the
+content does not).
+
+### Generate a Markdown document
+
+```bash
+uv run generate markdown \
+  --out output/document.md \
+  --complexity maximum \
+  --sections 20
+```
+
+(`md` is a shorthand alias for `markdown`.) Builds a `.md` from scratch - plain
+text, no dependencies. Each **section** is a heading plus blocks: paragraphs,
+bullet and numbered lists, GitHub-flavoured tables, and block quotes. Markdown
+has no images or page breaks, so the image block renders as a fenced code block
+and a page break renders as a horizontal rule. `--sections N` sets the length and
+`--seed N` makes the output byte-for-byte reproducible.
 
 ### Fill a Golden template
 

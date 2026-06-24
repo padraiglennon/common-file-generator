@@ -110,3 +110,43 @@ def test_sheet_success(tmp_path: Path) -> None:
 def test_sheet_invalid_sheets_exits_2(tmp_path: Path) -> None:
     code = main(["sheet", "--out", str(tmp_path / "w.xlsx"), "--sheets", "0"])
     assert code == 2
+
+
+def test_pdf_success(tmp_path: Path) -> None:
+    out = tmp_path / "document.pdf"
+    code = main(
+        ["pdf", "--out", str(out), "--complexity", "complex", "--sections", "4"]
+    )
+    assert code == 0
+    assert out.read_bytes()[:4] == b"%PDF"
+
+
+def test_pdf_invalid_sections_exits_2(tmp_path: Path) -> None:
+    code = main(["pdf", "--out", str(tmp_path / "d.pdf"), "--sections", "0"])
+    assert code == 2
+
+
+def test_markdown_success(tmp_path: Path) -> None:
+    import re
+
+    out = tmp_path / "document.md"
+    code = main(
+        ["markdown", "--out", str(out), "--complexity", "complex", "--sections", "4"]
+    )
+    assert code == 0
+    text = out.read_text(encoding="utf-8")
+    assert text.startswith("# ")
+    # Count section headings ("## N. ...") without matching "### " subheadings.
+    assert len(re.findall(r"^## \d+\. ", text, re.MULTILINE)) == 4
+
+
+def test_markdown_md_alias(tmp_path: Path) -> None:
+    out = tmp_path / "document.md"
+    code = main(["md", "--out", str(out), "--sections", "3"])
+    assert code == 0
+    assert out.read_text(encoding="utf-8").startswith("# ")
+
+
+def test_markdown_invalid_sections_exits_2(tmp_path: Path) -> None:
+    code = main(["markdown", "--out", str(tmp_path / "d.md"), "--sections", "0"])
+    assert code == 2

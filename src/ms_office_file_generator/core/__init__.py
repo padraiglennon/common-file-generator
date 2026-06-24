@@ -30,6 +30,8 @@ __all__ = [
     "generate",
     "generate_deck",
     "generate_doc",
+    "generate_markdown",
+    "generate_pdf",
     "generate_sheet",
     "load_config",
     "sheet_feature_pool",
@@ -133,5 +135,59 @@ def generate_sheet(
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = XlsxComplexityGenerator(
         level, sheets=sheets, seed=seed, rows=rows, cols=cols
+    )
+    return str(generator.save(out))
+
+
+def generate_pdf(
+    out: str,
+    *,
+    complexity: Complexity | str = Complexity.STANDARD,
+    sections: int = 5,
+    seed: int = 0,
+    blocks_per_section: int | None = None,
+) -> str:
+    """Generate a complexity-driven PDF document and write it to ``out``.
+
+    Generate mode for PDF: builds a ``.pdf`` from scratch (distinct from
+    :func:`generate`, which injects into a template). Kept here so the CLI and the
+    UI reuse the same core. ``blocks_per_section`` overrides the per-complexity
+    default density.
+    """
+    from ms_office_file_generator.generators import PdfComplexityGenerator
+
+    level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
+    generator = PdfComplexityGenerator(
+        level,
+        sections=sections,
+        seed=seed,
+        blocks_per_section=blocks_per_section,
+    )
+    return str(generator.save(out))
+
+
+def generate_markdown(
+    out: str,
+    *,
+    complexity: Complexity | str = Complexity.STANDARD,
+    sections: int = 5,
+    seed: int = 0,
+    blocks_per_section: int | None = None,
+) -> str:
+    """Generate a complexity-driven Markdown document and write it to ``out``.
+
+    Generate mode for Markdown: builds a ``.md`` from scratch (distinct from
+    :func:`generate`, which injects into a template). Kept here so the CLI and the
+    UI reuse the same core. ``blocks_per_section`` overrides the per-complexity
+    default density.
+    """
+    from ms_office_file_generator.generators import MarkdownComplexityGenerator
+
+    level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
+    generator = MarkdownComplexityGenerator(
+        level,
+        sections=sections,
+        seed=seed,
+        blocks_per_section=blocks_per_section,
     )
     return str(generator.save(out))

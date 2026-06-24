@@ -23,9 +23,17 @@ from ms_office_file_generator.core import (
     generate,
     generate_deck,
     generate_doc,
+    generate_markdown,
+    generate_pdf,
     generate_sheet,
 )
-from ms_office_file_generator.web.forms import deck_fields, doc_fields, sheet_fields
+from ms_office_file_generator.web.forms import (
+    deck_fields,
+    doc_fields,
+    md_fields,
+    pdf_fields,
+    sheet_fields,
+)
 
 _HERE = Path(__file__).parent
 _TEMPLATE_EXTS = {".pptx", ".docx", ".xlsx"}
@@ -87,6 +95,8 @@ def create_app(
                 "deck_fields": deck_fields(),
                 "doc_fields": doc_fields(),
                 "sheet_fields": sheet_fields(),
+                "pdf_fields": pdf_fields(),
+                "md_fields": md_fields(),
                 "max_upload_mb": max_upload_mb,
                 "version": asset_version,
             },
@@ -157,6 +167,40 @@ def create_app(
 
         token = _store(out, "workbook.xlsx")
         return _result(templates, request, token, "workbook.xlsx", report=None)
+
+    @app.post("/generate/pdf", response_class=HTMLResponse)
+    def generate_pdf_route(
+        request: Request,
+        complexity: str = Form("standard"),
+        sections: int = Form(5),
+        seed: int = Form(0),
+    ) -> HTMLResponse:
+        out = workdir / f"document-{secrets.token_hex(4)}.pdf"
+        try:
+            generate_pdf(str(out), complexity=complexity, sections=sections, seed=seed)
+        except ValueError as exc:
+            return _error(templates, request, str(exc))
+
+        token = _store(out, "document.pdf")
+        return _result(templates, request, token, "document.pdf", report=None)
+
+    @app.post("/generate/md", response_class=HTMLResponse)
+    def generate_markdown_route(
+        request: Request,
+        complexity: str = Form("standard"),
+        sections: int = Form(5),
+        seed: int = Form(0),
+    ) -> HTMLResponse:
+        out = workdir / f"document-{secrets.token_hex(4)}.md"
+        try:
+            generate_markdown(
+                str(out), complexity=complexity, sections=sections, seed=seed
+            )
+        except ValueError as exc:
+            return _error(templates, request, str(exc))
+
+        token = _store(out, "document.md")
+        return _result(templates, request, token, "document.md", report=None)
 
     @app.post("/generate/fill", response_class=HTMLResponse)
     async def generate_fill_route(
