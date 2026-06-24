@@ -24,6 +24,7 @@ from ms_office_file_generator.core import (
     generate,
     generate_deck,
     generate_doc,
+    generate_sheet,
 )
 
 
@@ -98,6 +99,32 @@ def build_parser() -> argparse.ArgumentParser:
     doc.add_argument("-v", "--verbose", action="store_true")
     doc.set_defaults(func=_run_doc)
 
+    sheet = sub.add_parser(
+        "sheet", help="Generate a complex Excel workbook from scratch."
+    )
+    sheet.add_argument("--out", required=True, type=Path)
+    sheet.add_argument(
+        "--complexity",
+        choices=[level.value for level in Complexity],
+        default=Complexity.STANDARD.value,
+    )
+    sheet.add_argument("--sheets", type=int, default=3)
+    sheet.add_argument("--seed", type=int, default=0)
+    sheet.add_argument(
+        "--rows",
+        type=int,
+        default=None,
+        help="Rows per table (default scales with complexity).",
+    )
+    sheet.add_argument(
+        "--cols",
+        type=int,
+        default=None,
+        help="Columns per table including label and date (default 3-5 random).",
+    )
+    sheet.add_argument("-v", "--verbose", action="store_true")
+    sheet.set_defaults(func=_run_sheet)
+
     return parser
 
 
@@ -153,6 +180,23 @@ def _run_doc(args: argparse.Namespace) -> int:
         print(f"Could not generate the document: {exc}", file=sys.stderr)
         return 2
     print(f"Created {out} ({args.sections} sections, {args.complexity} complexity).")
+    return 0
+
+
+def _run_sheet(args: argparse.Namespace) -> int:
+    try:
+        out = generate_sheet(
+            str(args.out),
+            complexity=args.complexity,
+            sheets=args.sheets,
+            seed=args.seed,
+            rows=args.rows,
+            cols=args.cols,
+        )
+    except ValueError as exc:
+        print(f"Could not generate the workbook: {exc}", file=sys.stderr)
+        return 2
+    print(f"Created {out} ({args.sheets} sheets, {args.complexity} complexity).")
     return 0
 
 

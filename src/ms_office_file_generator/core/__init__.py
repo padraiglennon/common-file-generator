@@ -3,6 +3,7 @@
 from ms_office_file_generator.core.complexity import (
     Complexity,
     doc_block_pool,
+    sheet_feature_pool,
     slide_pool,
 )
 from ms_office_file_generator.core.config import (
@@ -29,7 +30,9 @@ __all__ = [
     "generate",
     "generate_deck",
     "generate_doc",
+    "generate_sheet",
     "load_config",
+    "sheet_feature_pool",
     "slide_pool",
 ]
 
@@ -105,5 +108,30 @@ def generate_doc(
         sections=sections,
         seed=seed,
         blocks_per_section=blocks_per_section,
+    )
+    return str(generator.save(out))
+
+
+def generate_sheet(
+    out: str,
+    *,
+    complexity: Complexity | str = Complexity.STANDARD,
+    sheets: int = 3,
+    seed: int = 0,
+    rows: int | None = None,
+    cols: int | None = None,
+) -> str:
+    """Generate a complexity-driven Excel workbook and write it to ``out``.
+
+    Generate mode for Excel: builds an ``.xlsx`` from scratch (distinct from
+    :func:`generate`, which injects into a template). Kept here so the CLI and a
+    future UI reuse the same core. ``rows`` overrides the per-complexity table
+    size; ``cols`` fixes the column count (default randomised per table).
+    """
+    from ms_office_file_generator.generators import XlsxComplexityGenerator
+
+    level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
+    generator = XlsxComplexityGenerator(
+        level, sheets=sheets, seed=seed, rows=rows, cols=cols
     )
     return str(generator.save(out))

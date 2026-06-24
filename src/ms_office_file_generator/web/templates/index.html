@@ -21,6 +21,9 @@
       <button type="button" class="tab" id="tab-doc"
         role="tab" aria-selected="false"
         onclick="showPanel('doc')">Generate a document</button>
+      <button type="button" class="tab" id="tab-sheet"
+        role="tab" aria-selected="false"
+        onclick="showPanel('sheet')">Generate a spreadsheet</button>
       <button type="button" class="tab" id="tab-fill"
         role="tab" aria-selected="false"
         onclick="showPanel('fill')">Use a template</button>
@@ -93,6 +96,33 @@
       <div id="doc-result" class="result"></div>
     </section>
 
+    <section class="card panel" id="panel-sheet" role="tabpanel" hidden>
+      <h2>Generate a spreadsheet</h2>
+      <p class="hint">Build an Excel workbook from scratch at a chosen complexity.</p>
+      <form hx-post="/generate/sheet" hx-target="#sheet-result" hx-swap="innerHTML">
+        {% for field in sheet_fields %}
+        <label>
+          <span class="field-label">
+            {{ field.label }}
+            <span class="tip" tabindex="0" data-tip="{{ field.help }}"
+              aria-label="{{ field.help }}">?</span>
+          </span>
+          {% if field.kind == "select" %}
+          <select name="{{ field.name }}">
+            {% for choice in field.choices %}
+            <option value="{{ choice.value }}"{% if choice.value == field.default %} selected{% endif %}>{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="number" name="{{ field.name }}" value="{{ field.default }}">
+          {% endif %}
+        </label>
+        {% endfor %}
+        <button type="submit">Generate spreadsheet</button>
+      </form>
+      <div id="sheet-result" class="result"></div>
+    </section>
+
     <section class="card panel" id="panel-fill" role="tabpanel" hidden>
       <h2>Use a template</h2>
       <p class="hint">
@@ -130,7 +160,7 @@
 
   <script>
     function showPanel(which) {
-      for (const name of ["deck", "doc", "fill"]) {
+      for (const name of ["deck", "doc", "sheet", "fill"]) {
         const active = name === which;
         document.getElementById("panel-" + name).hidden = !active;
         const tab = document.getElementById("tab-" + name);

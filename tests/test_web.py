@@ -69,12 +69,14 @@ def test_every_deck_field_has_help_text() -> None:
 
 
 def test_fields_render_tooltips_and_required_markers(client) -> None:
-    from ms_office_file_generator.web.forms import doc_fields
+    from ms_office_file_generator.web.forms import doc_fields, sheet_fields
 
     html = client.get("/").text
-    # Every field across the deck, document, and fill forms carries a hover
-    # tooltip marker; help text is in its data-tip attribute, not shown inline.
-    expected = len(deck_fields()) + len(doc_fields()) + 2  # + 2 fill uploads
+    # Every field across the deck, document, spreadsheet, and fill forms carries
+    # a hover tooltip marker; help text is in its data-tip attribute.
+    expected = (
+        len(deck_fields()) + len(doc_fields()) + len(sheet_fields()) + 2  # uploads
+    )
     assert html.count('class="tip"') == expected
     assert "How busy each slide is" in html  # plain-language help (data-tip)
     assert 'class="help"' not in html  # no always-visible help lines
@@ -198,6 +200,43 @@ def test_doc_fields_track_the_core() -> None:
 
     names = {f.name for f in doc_fields()}
     assert {"complexity", "sections", "seed"} == names
+
+
+def test_index_has_spreadsheet_tab(client) -> None:
+    html = client.get("/").text
+    assert 'id="tab-sheet"' in html and 'id="panel-sheet"' in html
+    assert "Generate a spreadsheet" in html
+    assert 'hx-post="/generate/sheet"' in html
+
+
+def test_generate_spreadsheet_returns_downloadable_xlsx(client) -> None:
+    from openpyxl import load_workbook
+
+    resp = client.post(
+        "/generate/sheet",
+        data={"complexity": "maximum", "sheets": "3", "seed": "2"},
+    )
+    assert resp.status_code == 200
+    download = client.get(f"/download/{_token(resp.text)}")
+    assert download.status_code == 200
+    wb = load_workbook(io.BytesIO(download.content))
+    assert len(wb.sheetnames) == 3
+
+
+def test_generate_spreadsheet_invalid_sheets_errors(client) -> None:
+    resp = client.post(
+        "/generate/sheet",
+        data={"complexity": "standard", "sheets": "0", "seed": "0"},
+    )
+    assert resp.status_code == 400
+    assert "Could not generate" in resp.text
+
+
+def test_sheet_fields_track_the_core() -> None:
+    from ms_office_file_generator.web.forms import sheet_fields
+
+    names = {f.name for f in sheet_fields()}
+    assert {"complexity", "sheets", "seed"} == names
 
 
 def test_background_control_is_merged(client) -> None:

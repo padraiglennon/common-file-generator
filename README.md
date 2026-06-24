@@ -92,6 +92,30 @@ content blocks drawn from a pool that grows with complexity:
 
 `--sections N` sets the length and `--seed N` makes the output reproducible.
 
+### Generate an Excel workbook
+
+```bash
+uv run generate sheet \
+  --out output/workbook.xlsx \
+  --complexity maximum \
+  --sheets 5
+```
+
+Builds an `.xlsx` from scratch. Each **sheet** holds one or more data tables;
+complexity decides what each sheet gets:
+
+| Level | Sheet content |
+| --- | --- |
+| `minimal` | one plain data table |
+| `simple` | + formula total rows |
+| `standard` | + charts, styling |
+| `complex` | + a second table per sheet |
+| `maximum` | denser tables |
+
+`--sheets N` sets the workbook size, `--rows N` overrides the table size, and
+`--seed N` makes the output reproducible. Totals are live formulas
+(`=SUM`/`=AVERAGE`) the spreadsheet app evaluates on open.
+
 ### Fill a Golden template
 
 ```bash

@@ -23,8 +23,9 @@ from ms_office_file_generator.core import (
     generate,
     generate_deck,
     generate_doc,
+    generate_sheet,
 )
-from ms_office_file_generator.web.forms import deck_fields, doc_fields
+from ms_office_file_generator.web.forms import deck_fields, doc_fields, sheet_fields
 
 _HERE = Path(__file__).parent
 _TEMPLATE_EXTS = {".pptx", ".docx", ".xlsx"}
@@ -85,6 +86,7 @@ def create_app(
             {
                 "deck_fields": deck_fields(),
                 "doc_fields": doc_fields(),
+                "sheet_fields": sheet_fields(),
                 "max_upload_mb": max_upload_mb,
                 "version": asset_version,
             },
@@ -139,6 +141,22 @@ def create_app(
 
         token = _store(out, "document.docx")
         return _result(templates, request, token, "document.docx", report=None)
+
+    @app.post("/generate/sheet", response_class=HTMLResponse)
+    def generate_sheet_route(
+        request: Request,
+        complexity: str = Form("standard"),
+        sheets: int = Form(3),
+        seed: int = Form(0),
+    ) -> HTMLResponse:
+        out = workdir / f"workbook-{secrets.token_hex(4)}.xlsx"
+        try:
+            generate_sheet(str(out), complexity=complexity, sheets=sheets, seed=seed)
+        except ValueError as exc:
+            return _error(templates, request, str(exc))
+
+        token = _store(out, "workbook.xlsx")
+        return _result(templates, request, token, "workbook.xlsx", report=None)
 
     @app.post("/generate/fill", response_class=HTMLResponse)
     async def generate_fill_route(

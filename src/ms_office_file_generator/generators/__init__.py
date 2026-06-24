@@ -6,5 +6,10 @@ chosen complexity level - the common "give me an N-slide complex deck" case.
 
 from ms_office_file_generator.generators.docx import DocxComplexityGenerator
 from ms_office_file_generator.generators.pptx import PptxComplexityGenerator
+from ms_office_file_generator.generators.xlsx import XlsxComplexityGenerator
 
-__all__ = ["DocxComplexityGenerator", "PptxComplexityGenerator"]
+__all__ = [
+    "DocxComplexityGenerator",
+    "PptxComplexityGenerator",
+    "XlsxComplexityGenerator",
+]

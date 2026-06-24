@@ -37,6 +37,10 @@ deck: ## Generate a sample 70-slide maximum deck into output/
 doc: ## Generate a sample 20-section maximum Word document into output/
 	$(UV) run generate doc --out output/document.docx --complexity maximum --sections 20
 
+.PHONY: sheet
+sheet: ## Generate a sample 5-sheet maximum Excel workbook into output/
+	$(UV) run generate sheet --out output/workbook.xlsx --complexity maximum --sheets 5
+
 .PHONY: test
 test: ## Run the test suite
 	$(UV) run pytest

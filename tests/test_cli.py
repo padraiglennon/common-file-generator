@@ -94,3 +94,19 @@ def test_doc_success(tmp_path: Path) -> None:
 def test_doc_invalid_sections_exits_2(tmp_path: Path) -> None:
     code = main(["doc", "--out", str(tmp_path / "d.docx"), "--sections", "0"])
     assert code == 2
+
+
+def test_sheet_success(tmp_path: Path) -> None:
+    from openpyxl import load_workbook
+
+    out = tmp_path / "workbook.xlsx"
+    code = main(
+        ["sheet", "--out", str(out), "--complexity", "complex", "--sheets", "3"]
+    )
+    assert code == 0
+    assert len(load_workbook(str(out)).sheetnames) == 3
+
+
+def test_sheet_invalid_sheets_exits_2(tmp_path: Path) -> None:
+    code = main(["sheet", "--out", str(tmp_path / "w.xlsx"), "--sheets", "0"])
+    assert code == 2

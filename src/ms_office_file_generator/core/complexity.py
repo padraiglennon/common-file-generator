@@ -10,6 +10,7 @@ as section dividers carry a low weight so they stay rare, while content slides
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -101,3 +102,60 @@ _DOC_BLOCKS: dict[Complexity, tuple[tuple[str, int], ...]] = {
 def doc_block_pool(level: Complexity) -> tuple[tuple[str, int], ...]:
     """Return the weighted ``(block_type, weight)`` pool for Word sections."""
     return _DOC_BLOCKS[level]
+
+
+@dataclass(frozen=True)
+class SheetFeatures:
+    """Which spreadsheet features a sheet gets, plus its default table size."""
+
+    tables_per_sheet: int
+    rows_per_table: int
+    formulas: bool
+    charts: bool
+    styling: bool
+
+
+# Excel features per level. Cumulative: richer levels add formulas, then charts,
+# then styling and a second table per sheet.
+_SHEET_FEATURES: dict[Complexity, SheetFeatures] = {
+    Complexity.MINIMAL: SheetFeatures(
+        tables_per_sheet=1,
+        rows_per_table=6,
+        formulas=False,
+        charts=False,
+        styling=False,
+    ),
+    Complexity.SIMPLE: SheetFeatures(
+        tables_per_sheet=1,
+        rows_per_table=8,
+        formulas=True,
+        charts=False,
+        styling=False,
+    ),
+    Complexity.STANDARD: SheetFeatures(
+        tables_per_sheet=1,
+        rows_per_table=10,
+        formulas=True,
+        charts=True,
+        styling=True,
+    ),
+    Complexity.COMPLEX: SheetFeatures(
+        tables_per_sheet=2,
+        rows_per_table=12,
+        formulas=True,
+        charts=True,
+        styling=True,
+    ),
+    Complexity.MAXIMUM: SheetFeatures(
+        tables_per_sheet=3,
+        rows_per_table=15,
+        formulas=True,
+        charts=True,
+        styling=True,
+    ),
+}
+
+
+def sheet_feature_pool(level: Complexity) -> SheetFeatures:
+    """Return the :class:`SheetFeatures` for ``level``."""
+    return _SHEET_FEATURES[level]

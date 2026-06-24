@@ -12,7 +12,12 @@ import inspect
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ms_office_file_generator.core import Complexity, generate_deck, generate_doc
+from ms_office_file_generator.core import (
+    Complexity,
+    generate_deck,
+    generate_doc,
+    generate_sheet,
+)
 from ms_office_file_generator.generators.background import BackgroundMode
 
 
@@ -107,6 +112,27 @@ _DOC_FIELD_META: dict[str, tuple[str, str, str]] = {
     ),
 }
 
+# Metadata for the Excel workbook form (generate_sheet parameters).
+_SHEET_FIELD_META: dict[str, tuple[str, str, str]] = {
+    "complexity": (
+        "Complexity",
+        "select",
+        "How rich each sheet is. Higher means formulas, charts, styling and "
+        "more tables.",
+    ),
+    "sheets": (
+        "Number of sheets",
+        "number",
+        "How many worksheets to create.",
+    ),
+    "seed": (
+        "Variation",
+        "number",
+        "Pick any number. The same number makes the same workbook every time; "
+        "change it for a different one.",
+    ),
+}
+
 _ENUM_CHOICES: dict[str, type[Enum]] = {
     "complexity": Complexity,
     "background": BackgroundMode,
@@ -121,6 +147,11 @@ def deck_fields() -> list[Field]:
 def doc_fields() -> list[Field]:
     """Return the document form fields, derived from ``generate_doc``'s signature."""
     return _fields_from(generate_doc, _DOC_FIELD_META)
+
+
+def sheet_fields() -> list[Field]:
+    """Return the workbook form fields, derived from ``generate_sheet``."""
+    return _fields_from(generate_sheet, _SHEET_FIELD_META)
 
 
 def _fields_from(func: object, meta: dict[str, tuple[str, str, str]]) -> list[Field]:
