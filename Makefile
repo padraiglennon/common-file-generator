@@ -1,0 +1,64 @@
+# Makefile for ms-office-file-generator.
+# All commands run through uv so they use the project virtualenv.
+
+UV ?= uv
+HOST ?= 127.0.0.1
+PORT ?= 18990
+
+.DEFAULT_GOAL := help
+
+.PHONY: help
+help: ## Show this help
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| sort \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: install
+install: ## Sync core + dev dependencies
+	$(UV) sync
+
+.PHONY: install-web
+install-web: ## Sync with the optional web UI extra
+	$(UV) sync --extra web
+
+.PHONY: hooks
+hooks: ## Install pre-commit git hooks
+	$(UV) run pre-commit install
+
+.PHONY: serve
+serve: install-web ## Run the web UI (HOST/PORT overridable)
+	$(UV) run gen-ui --host $(HOST) --port $(PORT)
+
+.PHONY: deck
+deck: ## Generate a sample 70-slide maximum deck into output/
+	$(UV) run generate deck --out output/deck.pptx --complexity maximum --slides 70
+
+.PHONY: test
+test: ## Run the test suite
+	$(UV) run pytest
+
+.PHONY: lint
+lint: ## Lint with ruff
+	$(UV) run ruff check .
+
+.PHONY: format
+format: ## Format with ruff
+	$(UV) run ruff format .
+
+.PHONY: check
+check: lint test ## Lint then test
+
+.PHONY: pre-commit
+pre-commit: ## Run all pre-commit hooks on all files
+	$(UV) run pre-commit run --all-files
+
+.PHONY: build
+build: ## Build the wheel
+	$(UV) build --wheel
+
+.PHONY: clean
+clean: ## Remove build artifacts and caches
+	rm -rf dist build output
+	find . -type d -name __pycache__ -prune -exec rm -rf {} +
+	find . -type d -name '.pytest_cache' -prune -exec rm -rf {} +
+	find . -type d -name '.ruff_cache' -prune -exec rm -rf {} +

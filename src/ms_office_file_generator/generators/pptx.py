@@ -104,15 +104,19 @@ class PptxComplexityGenerator:
         prs.slide_height = _SLIDE_H
         return prs
 
+    def _apply_background(self, slide: object) -> None:
+        color = self._background.color_for(self._rng)
+        if color is not None:
+            style.set_background(slide, color)
+
     def _add_title_slide(self, prs: Presentation) -> None:
         slide = prs.slides.add_slide(prs.slide_layouts[0])
+        self._apply_background(slide)
         slide_types.title_slide(slide, self._ctx)
 
     def _add_content_slide(self, prs: Presentation, index: int) -> None:
         layout = prs.slide_layouts[_BLANK_LAYOUT]
         slide = prs.slides.add_slide(layout)
-        color = self._background.color_for(self._rng)
-        if color is not None:
-            style.set_background(slide, color)
+        self._apply_background(slide)
         key = self._rng.choices(self._pool_keys, weights=self._pool_weights)[0]
         _BUILDERS[key](slide, self._ctx, index)

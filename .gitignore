@@ -203,9 +203,17 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
-# Generated Office files (never commit produced output)
+# Generated / transient Office files (never commit produced output).
+# Templates are not committed (tests build them in-memory), so any loose
+# .pptx/.docx/.xlsx is an output. Keep deliberate assets out of the repo root.
 /output/
 /examples/
+*.pptx
+*.docx
+*.xlsx
+*.report.txt
+# LibreOffice lock files for open documents.
+.~lock.*#
 
 # Ruff stuff:
 .ruff_cache/

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Office file generator</title>
+  <link rel="stylesheet" href="/static/style.css?v={{ version }}">
+  <script src="/static/htmx.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Office file generator</h1>
+    <p>Create test PowerPoint, Word, and Excel files - no command line needed.</p>
+  </header>
+
+  <main>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-active" id="tab-deck"
+        role="tab" aria-selected="true"
+        onclick="showPanel('deck')">Generate a deck</button>
+      <button type="button" class="tab" id="tab-fill"
+        role="tab" aria-selected="false"
+        onclick="showPanel('fill')">Use a template</button>
+    </div>
+
+    <section class="card panel is-active" id="panel-deck" role="tabpanel">
+      <h2>Generate a deck</h2>
+      <p class="hint">Build a PowerPoint from scratch at a chosen complexity.</p>
+      <form hx-post="/generate/deck" hx-target="#deck-result" hx-swap="innerHTML">
+        {% for field in deck_fields %}
+        <label>
+          <span class="field-label">
+            {{ field.label }}
+            <span class="tip" tabindex="0" data-tip="{{ field.help }}"
+              aria-label="{{ field.help }}">?</span>
+          </span>
+          {% if field.name == "background" %}
+          <select name="background"
+            onchange="document.getElementById('custom-colour').hidden = this.value !== 'custom'">
+            {% for choice in field.choices %}
+            <option value="{{ choice.value }}"{% if choice.value == field.default %} selected{% endif %}>{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+          <span id="custom-colour" class="color-field" hidden>
+            <input type="color" name="background_color" value="#2e86c1">
+            <span class="color-hint">pick your colour</span>
+          </span>
+          {% elif field.kind == "select" %}
+          <select name="{{ field.name }}">
+            {% for choice in field.choices %}
+            <option value="{{ choice.value }}"{% if choice.value == field.default %} selected{% endif %}>{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+          {% elif field.kind == "number" %}
+          <input type="number" name="{{ field.name }}" value="{{ field.default }}">
+          {% else %}
+          <input type="text" name="{{ field.name }}" value="{{ field.default }}">
+          {% endif %}
+        </label>
+        {% endfor %}
+        <button type="submit">Generate deck</button>
+      </form>
+      <div id="deck-result" class="result"></div>
+    </section>
+
+    <section class="card panel" id="panel-fill" role="tabpanel" hidden>
+      <h2>Use a template</h2>
+      <p class="hint">
+        Upload a ready-made template (.pptx / .docx / .xlsx) and a JSON data file.
+        Maximum upload size: {{ max_upload_mb }} MB.
+      </p>
+      <form hx-post="/generate/fill" hx-target="#fill-result" hx-swap="innerHTML"
+            hx-encoding="multipart/form-data">
+        <label>
+          <span class="field-label">
+            Golden template
+            <span class="req" title="Required">*</span>
+            <span class="tip" tabindex="0"
+              data-tip="Your ready-made PowerPoint, Word or Excel file to fill in."
+              aria-label="Your ready-made file to fill in.">?</span>
+          </span>
+          <input type="file" name="template" accept=".pptx,.docx,.xlsx" required>
+        </label>
+        <label>
+          <span class="field-label">
+            JSON config
+            <span class="req" title="Required">*</span>
+            <span class="tip" tabindex="0"
+              data-tip="The data file that says what text and pictures to put in."
+              aria-label="The data file that says what to put in.">?</span>
+          </span>
+          <input type="file" name="config" accept=".json" required>
+        </label>
+        <p class="req-note"><span class="req">*</span> required</p>
+        <button type="submit">Fill template</button>
+      </form>
+      <div id="fill-result" class="result"></div>
+    </section>
+  </main>
+
+  <script>
+    function showPanel(which) {
+      for (const name of ["deck", "fill"]) {
+        const active = name === which;
+        document.getElementById("panel-" + name).hidden = !active;
+        const tab = document.getElementById("tab-" + name);
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+      }
+    }
+  </script>
+</body>
+</html>

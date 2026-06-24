@@ -1,0 +1,14 @@
+<div class="success flash">
+  <p class="success-head">
+    <span class="check">✓</span>
+    Your file is ready: <strong>{{ filename }}</strong>
+  </p>
+  <a class="download" href="/download/{{ token }}" download>Download {{ filename }}</a>
+  <p class="generated-at">Generated at {{ generated_at }}</p>
+  {% if report %}
+  <details open>
+    <summary>Report</summary>
+    <pre>{{ report }}</pre>
+  </details>
+  {% endif %}
+</div>

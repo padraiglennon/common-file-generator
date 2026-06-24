@@ -95,11 +95,8 @@ def test_theme_background_is_consistent(tmp_path: Path) -> None:
     out = tmp_path / "bg.pptx"
     generate_deck(str(out), complexity="simple", slides=8, seed=1, background="theme")
     prs = Presentation(str(out))
-    tints = {
-        str(slide.background.fill.fore_color.rgb)
-        for i, slide in enumerate(prs.slides)
-        if i > 0
-    }
+    # Every slide, including the title slide, gets the consistent tint.
+    tints = {str(slide.background.fill.fore_color.rgb) for slide in prs.slides}
     assert tints == {"EAF2F8"}
 
 
@@ -121,11 +118,8 @@ def test_explicit_background_color(tmp_path: Path) -> None:
         str(out), complexity="simple", slides=5, seed=1, background_color="FFEFD5"
     )
     prs = Presentation(str(out))
-    tints = {
-        str(slide.background.fill.fore_color.rgb)
-        for i, slide in enumerate(prs.slides)
-        if i > 0
-    }
+    # Includes the title slide (slide 0).
+    tints = {str(slide.background.fill.fore_color.rgb) for slide in prs.slides}
     assert tints == {"FFEFD5"}
 
 
