@@ -23,6 +23,7 @@ from ms_office_file_generator.core import (
     ConfigError,
     generate,
     generate_deck,
+    generate_doc,
 )
 
 
@@ -79,6 +80,24 @@ def build_parser() -> argparse.ArgumentParser:
     deck.add_argument("-v", "--verbose", action="store_true")
     deck.set_defaults(func=_run_deck)
 
+    doc = sub.add_parser("doc", help="Generate a complex Word document from scratch.")
+    doc.add_argument("--out", required=True, type=Path)
+    doc.add_argument(
+        "--complexity",
+        choices=[level.value for level in Complexity],
+        default=Complexity.STANDARD.value,
+    )
+    doc.add_argument("--sections", type=int, default=5)
+    doc.add_argument("--seed", type=int, default=0)
+    doc.add_argument(
+        "--blocks-per-section",
+        type=int,
+        default=None,
+        help="Content blocks per section (default scales with complexity).",
+    )
+    doc.add_argument("-v", "--verbose", action="store_true")
+    doc.set_defaults(func=_run_doc)
+
     return parser
 
 
@@ -118,6 +137,22 @@ def _run_deck(args: argparse.Namespace) -> int:
         print(f"Could not generate the deck: {exc}", file=sys.stderr)
         return 2
     print(f"Created {out} ({args.slides} slides, {args.complexity} complexity).")
+    return 0
+
+
+def _run_doc(args: argparse.Namespace) -> int:
+    try:
+        out = generate_doc(
+            str(args.out),
+            complexity=args.complexity,
+            sections=args.sections,
+            seed=args.seed,
+            blocks_per_section=args.blocks_per_section,
+        )
+    except ValueError as exc:
+        print(f"Could not generate the document: {exc}", file=sys.stderr)
+        return 2
+    print(f"Created {out} ({args.sections} sections, {args.complexity} complexity).")
     return 0
 
 

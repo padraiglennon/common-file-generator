@@ -1,6 +1,10 @@
 """Core engine: config loading, validation, reporting, and the base injector."""
 
-from ms_office_file_generator.core.complexity import Complexity, slide_pool
+from ms_office_file_generator.core.complexity import (
+    Complexity,
+    doc_block_pool,
+    slide_pool,
+)
 from ms_office_file_generator.core.config import (
     Config,
     ConfigError,
@@ -21,8 +25,10 @@ __all__ = [
     "Report",
     "Severity",
     "TableSpec",
+    "doc_block_pool",
     "generate",
     "generate_deck",
+    "generate_doc",
     "load_config",
     "slide_pool",
 ]
@@ -72,5 +78,32 @@ def generate_deck(
         video_url=video_url,
         theme_path=theme_path,
         background=bg,
+    )
+    return str(generator.save(out))
+
+
+def generate_doc(
+    out: str,
+    *,
+    complexity: Complexity | str = Complexity.STANDARD,
+    sections: int = 5,
+    seed: int = 0,
+    blocks_per_section: int | None = None,
+) -> str:
+    """Generate a complexity-driven Word document and write it to ``out``.
+
+    Generate mode for Word: builds a ``.docx`` from scratch (distinct from
+    :func:`generate`, which injects into a template). Kept here so the CLI and a
+    future UI reuse the same core. ``blocks_per_section`` overrides the
+    per-complexity default density.
+    """
+    from ms_office_file_generator.generators import DocxComplexityGenerator
+
+    level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
+    generator = DocxComplexityGenerator(
+        level,
+        sections=sections,
+        seed=seed,
+        blocks_per_section=blocks_per_section,
     )
     return str(generator.save(out))

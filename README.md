@@ -70,6 +70,28 @@ Options:
 - `--background-color HEX` - an explicit consistent colour (e.g. `EAF2F8`) that
   overrides `--background`.
 
+### Generate a Word document
+
+```bash
+uv run generate doc \
+  --out output/document.docx \
+  --complexity maximum \
+  --sections 20
+```
+
+Builds a `.docx` from scratch. Each **section** is a heading plus a run of
+content blocks drawn from a pool that grows with complexity:
+
+| Level | Content blocks |
+| --- | --- |
+| `minimal` | headings + paragraphs |
+| `simple` | + bullet lists |
+| `standard` | + numbered lists, tables |
+| `complex` | + images, block quotes |
+| `maximum` | + page breaks |
+
+`--sections N` sets the length and `--seed N` makes the output reproducible.
+
 ### Fill a Golden template
 
 ```bash

@@ -73,3 +73,24 @@ def test_deck_success(tmp_path: Path) -> None:
 def test_deck_invalid_slides_exits_2(tmp_path: Path) -> None:
     code = main(["deck", "--out", str(tmp_path / "d.pptx"), "--slides", "0"])
     assert code == 2
+
+
+def test_doc_success(tmp_path: Path) -> None:
+    from docx import Document
+
+    out = tmp_path / "document.docx"
+    code = main(
+        ["doc", "--out", str(out), "--complexity", "complex", "--sections", "4"]
+    )
+    assert code == 0
+    h1 = [
+        p
+        for p in Document(str(out)).paragraphs
+        if p.style and p.style.name == "Heading 1"
+    ]
+    assert len(h1) == 4
+
+
+def test_doc_invalid_sections_exits_2(tmp_path: Path) -> None:
+    code = main(["doc", "--out", str(tmp_path / "d.docx"), "--sections", "0"])
+    assert code == 2

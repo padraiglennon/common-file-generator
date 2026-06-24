@@ -18,8 +18,13 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from ms_office_file_generator.core import ConfigError, generate, generate_deck
-from ms_office_file_generator.web.forms import deck_fields
+from ms_office_file_generator.core import (
+    ConfigError,
+    generate,
+    generate_deck,
+    generate_doc,
+)
+from ms_office_file_generator.web.forms import deck_fields, doc_fields
 
 _HERE = Path(__file__).parent
 _TEMPLATE_EXTS = {".pptx", ".docx", ".xlsx"}
@@ -79,6 +84,7 @@ def create_app(
             "index.html",
             {
                 "deck_fields": deck_fields(),
+                "doc_fields": doc_fields(),
                 "max_upload_mb": max_upload_mb,
                 "version": asset_version,
             },
@@ -117,6 +123,22 @@ def create_app(
 
         token = _store(out, "deck.pptx")
         return _result(templates, request, token, "deck.pptx", report=None)
+
+    @app.post("/generate/doc", response_class=HTMLResponse)
+    def generate_doc_route(
+        request: Request,
+        complexity: str = Form("standard"),
+        sections: int = Form(5),
+        seed: int = Form(0),
+    ) -> HTMLResponse:
+        out = workdir / f"document-{secrets.token_hex(4)}.docx"
+        try:
+            generate_doc(str(out), complexity=complexity, sections=sections, seed=seed)
+        except ValueError as exc:
+            return _error(templates, request, str(exc))
+
+        token = _store(out, "document.docx")
+        return _result(templates, request, token, "document.docx", report=None)
 
     @app.post("/generate/fill", response_class=HTMLResponse)
     async def generate_fill_route(

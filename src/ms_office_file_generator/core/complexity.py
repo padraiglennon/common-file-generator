@@ -61,3 +61,43 @@ _POOLS: dict[Complexity, tuple[tuple[str, int], ...]] = {
 def slide_pool(level: Complexity) -> tuple[tuple[str, int], ...]:
     """Return the weighted ``(slide_type, weight)`` pool allowed at ``level``."""
     return _POOLS[level]
+
+
+# Word content blocks per level. A section always opens with a heading and a
+# paragraph; these are the *extra* blocks that may follow, drawn by weight.
+# Richer levels are supersets, so a document always has variety.
+_DOC_BLOCKS: dict[Complexity, tuple[tuple[str, int], ...]] = {
+    Complexity.MINIMAL: (("paragraph", 1),),
+    Complexity.SIMPLE: (
+        ("paragraph", 4),
+        ("bullets", 3),
+    ),
+    Complexity.STANDARD: (
+        ("paragraph", 4),
+        ("bullets", 3),
+        ("numbered", 3),
+        ("table", 2),
+    ),
+    Complexity.COMPLEX: (
+        ("paragraph", 4),
+        ("bullets", 3),
+        ("numbered", 3),
+        ("table", 3),
+        ("image", 2),
+        ("quote", 2),
+    ),
+    Complexity.MAXIMUM: (
+        ("paragraph", 4),
+        ("bullets", 3),
+        ("numbered", 3),
+        ("table", 3),
+        ("image", 3),
+        ("quote", 2),
+        ("page_break", 1),
+    ),
+}
+
+
+def doc_block_pool(level: Complexity) -> tuple[tuple[str, int], ...]:
+    """Return the weighted ``(block_type, weight)`` pool for Word sections."""
+    return _DOC_BLOCKS[level]

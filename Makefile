@@ -33,6 +33,10 @@ serve: install-web ## Run the web UI (HOST/PORT overridable)
 deck: ## Generate a sample 70-slide maximum deck into output/
 	$(UV) run generate deck --out output/deck.pptx --complexity maximum --slides 70
 
+.PHONY: doc
+doc: ## Generate a sample 20-section maximum Word document into output/
+	$(UV) run generate doc --out output/document.docx --complexity maximum --sections 20
+
 .PHONY: test
 test: ## Run the test suite
 	$(UV) run pytest

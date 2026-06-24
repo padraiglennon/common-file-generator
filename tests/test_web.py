@@ -69,10 +69,13 @@ def test_every_deck_field_has_help_text() -> None:
 
 
 def test_fields_render_tooltips_and_required_markers(client) -> None:
+    from ms_office_file_generator.web.forms import doc_fields
+
     html = client.get("/").text
-    # Every field carries a hover tooltip marker; help text is in its data-tip
-    # attribute (a styled bubble), not shown inline.
-    assert html.count('class="tip"') == len(deck_fields()) + 2  # + 2 fill uploads
+    # Every field across the deck, document, and fill forms carries a hover
+    # tooltip marker; help text is in its data-tip attribute, not shown inline.
+    expected = len(deck_fields()) + len(doc_fields()) + 2  # + 2 fill uploads
+    assert html.count('class="tip"') == expected
     assert "How busy each slide is" in html  # plain-language help (data-tip)
     assert 'class="help"' not in html  # no always-visible help lines
     # Required uploads are clearly marked.
@@ -158,6 +161,43 @@ def test_index_has_tabs(client) -> None:
     assert 'id="tab-deck"' in html and 'id="tab-fill"' in html
     assert 'id="panel-deck"' in html and 'id="panel-fill"' in html
     assert "showPanel(" in html  # the toggle script
+
+
+def test_index_has_document_tab(client) -> None:
+    html = client.get("/").text
+    assert 'id="tab-doc"' in html and 'id="panel-doc"' in html
+    assert "Generate a document" in html
+    assert 'hx-post="/generate/doc"' in html
+
+
+def test_generate_document_returns_downloadable_docx(client) -> None:
+    from docx import Document
+
+    resp = client.post(
+        "/generate/doc",
+        data={"complexity": "complex", "sections": "5", "seed": "2"},
+    )
+    assert resp.status_code == 200
+    download = client.get(f"/download/{_token(resp.text)}")
+    assert download.status_code == 200
+    doc = Document(io.BytesIO(download.content))
+    assert len(doc.paragraphs) > 0
+
+
+def test_generate_document_invalid_sections_errors(client) -> None:
+    resp = client.post(
+        "/generate/doc",
+        data={"complexity": "standard", "sections": "0", "seed": "0"},
+    )
+    assert resp.status_code == 400
+    assert "Could not generate" in resp.text
+
+
+def test_doc_fields_track_the_core() -> None:
+    from ms_office_file_generator.web.forms import doc_fields
+
+    names = {f.name for f in doc_fields()}
+    assert {"complexity", "sections", "seed"} == names
 
 
 def test_background_control_is_merged(client) -> None:

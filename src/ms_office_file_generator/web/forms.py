@@ -12,7 +12,7 @@ import inspect
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ms_office_file_generator.core import Complexity, generate_deck
+from ms_office_file_generator.core import Complexity, generate_deck, generate_doc
 from ms_office_file_generator.generators.background import BackgroundMode
 
 
@@ -87,6 +87,26 @@ _COMPLEXITY_LABELS: dict[str, str] = {
     "maximum": "Maximum",
 }
 
+# Metadata for the Word document form (generate_doc parameters).
+_DOC_FIELD_META: dict[str, tuple[str, str, str]] = {
+    "complexity": (
+        "Complexity",
+        "select",
+        "How rich each section is. Higher means more lists, tables, images and quotes.",
+    ),
+    "sections": (
+        "Number of sections",
+        "number",
+        "How many sections (a heading plus content) to create.",
+    ),
+    "seed": (
+        "Variation",
+        "number",
+        "Pick any number. The same number makes the same document every time; "
+        "change it for a different one.",
+    ),
+}
+
 _ENUM_CHOICES: dict[str, type[Enum]] = {
     "complexity": Complexity,
     "background": BackgroundMode,
@@ -95,9 +115,18 @@ _ENUM_CHOICES: dict[str, type[Enum]] = {
 
 def deck_fields() -> list[Field]:
     """Return the deck form fields, derived from ``generate_deck``'s signature."""
-    signature = inspect.signature(generate_deck)
+    return _fields_from(generate_deck, _DECK_FIELD_META)
+
+
+def doc_fields() -> list[Field]:
+    """Return the document form fields, derived from ``generate_doc``'s signature."""
+    return _fields_from(generate_doc, _DOC_FIELD_META)
+
+
+def _fields_from(func: object, meta: dict[str, tuple[str, str, str]]) -> list[Field]:
+    signature = inspect.signature(func)
     fields: list[Field] = []
-    for name, (label, kind, help_text) in _DECK_FIELD_META.items():
+    for name, (label, kind, help_text) in meta.items():
         parameter = signature.parameters.get(name)
         default = _default_str(parameter.default if parameter else "")
         fields.append(
