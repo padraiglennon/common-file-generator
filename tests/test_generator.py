@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from pptx import Presentation
+from pptx.enum.dml import MSO_FILL
 
 from ms_office_file_generator.core import Complexity, generate_deck
 from ms_office_file_generator.generators import PptxComplexityGenerator
@@ -128,17 +129,59 @@ def test_invalid_background_color_raises(tmp_path: Path) -> None:
         generate_deck(str(tmp_path / "x.pptx"), slides=3, background_color="nothex")
 
 
+_DIVIDER_BG = "2B3A42"  # OCEAN.divider_background
+
+
+def _is_divider(slide: object) -> bool:
+    fill = slide.background.fill
+    if fill.type != MSO_FILL.SOLID:
+        return False
+    return str(fill.fore_color.rgb) == _DIVIDER_BG
+
+
 def test_dividers_stay_rare(tmp_path: Path) -> None:
     # Sparse divider slides must be punctuation, not a large share of the deck.
     out = tmp_path / "max.pptx"
     generate_deck(str(out), complexity="maximum", slides=70, seed=0)
     prs = Presentation(str(out))
     dividers = sum(
-        1
-        for i, slide in enumerate(prs.slides)
-        if i > 0 and len(list(slide.shapes)) <= 1
+        1 for i, slide in enumerate(prs.slides) if i > 0 and _is_divider(slide)
     )
     assert dividers <= len(list(prs.slides)) * 0.15
+
+
+def test_no_content_slide_is_title_only(tmp_path: Path) -> None:
+    # Every content slide must carry body content, not just a heading - a
+    # title-only slide reads as empty. Dividers included.
+    for level in ("minimal", "simple", "standard", "complex", "maximum"):
+        out = tmp_path / f"{level}.pptx"
+        generate_deck(str(out), complexity=level, slides=60, seed=0)
+        prs = Presentation(str(out))
+        for n, slide in enumerate(prs.slides):
+            if n == 0:
+                continue  # the title slide is allowed to be a title + subtitle
+            assert len(list(slide.shapes)) >= 2, (
+                f"{level} slide {n} is title-only (no content)"
+            )
+
+
+def test_divider_slide_has_subtitle(tmp_path: Path) -> None:
+    out = tmp_path / "max.pptx"
+    generate_deck(str(out), complexity="maximum", slides=70, seed=0)
+    prs = Presentation(str(out))
+    # A divider carries a heading, an accent shape, and a supporting subtitle.
+    dividers = [
+        slide for i, slide in enumerate(prs.slides) if i > 0 and _is_divider(slide)
+    ]
+    assert dividers, "no divider slide was drawn to exercise this test"
+    for slide in dividers:
+        assert any(s.shape_type == 1 for s in slide.shapes)  # AUTO_SHAPE accent
+        texts = [
+            s.text_frame.text
+            for s in slide.shapes
+            if s.shape_type == 17 and s.text_frame.text.strip()  # TEXT_BOX
+        ]
+        assert len(texts) >= 2  # heading + subtitle, both non-empty
 
 
 def test_seed_is_deterministic(tmp_path: Path) -> None:

@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from PIL import Image, ImageDraw
 from pptx.chart.data import CategoryChartData
 from pptx.enum.chart import XL_CHART_TYPE
+from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
 
 from ms_office_file_generator.core.lorem import Lorem
@@ -65,7 +66,7 @@ def title_slide(slide: object, ctx: SlideContext) -> None:
 
 def divider_slide(slide: object, ctx: SlideContext, index: int) -> None:
     style.set_background(slide, ctx.theme.divider_background)
-    box = Box(Inches(1.2), Inches(2.8), Inches(11), Inches(1.8))
+    box = Box(Inches(1.2), Inches(2.4), Inches(11), Inches(1.6))
     shape = slide.shapes.add_textbox(box.left, box.top, box.width, box.height)
     frame = shape.text_frame
     frame.word_wrap = True
@@ -74,6 +75,28 @@ def divider_slide(slide: object, ctx: SlideContext, index: int) -> None:
     run.font.size = Pt(40)
     run.font.name = ctx.theme.title_font
     run.font.color.rgb = ctx.theme.accent
+
+    accent = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(1.25),
+        Inches(4.0),
+        Inches(2.2),
+        Inches(0.12),
+    )
+    accent.fill.solid()
+    accent.fill.fore_color.rgb = ctx.theme.accent
+    accent.line.fill.background()
+
+    subtitle = slide.shapes.add_textbox(
+        Inches(1.2), Inches(4.3), Inches(11), Inches(1.4)
+    )
+    sub_frame = subtitle.text_frame
+    sub_frame.word_wrap = True
+    sub_run = sub_frame.paragraphs[0].add_run()
+    sub_run.text = ctx.lorem.sentence(8, 16)
+    sub_run.font.size = Pt(18)
+    sub_run.font.name = ctx.theme.body_font
+    sub_run.font.color.rgb = ctx.theme.on_fill_color
 
 
 def bullets_slide(slide: object, ctx: SlideContext, index: int) -> None:
