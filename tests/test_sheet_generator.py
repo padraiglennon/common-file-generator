@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from openpyxl import load_workbook
 
-from ms_office_file_generator.core import Complexity, generate_sheet
-from ms_office_file_generator.generators import XlsxComplexityGenerator
+from common_file_generator.core import Complexity, generate_sheet
+from common_file_generator.generators import XlsxComplexityGenerator
 
 
 def _formulas(path: Path) -> list[str]:

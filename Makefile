@@ -1,10 +1,10 @@
-# Makefile for ms-office-file-generator.
+# Makefile for common-file-generator.
 # All commands run through uv so they use the project virtualenv.
 
 UV ?= uv
 HOST ?= 127.0.0.1
 PORT ?= 18990
-IMAGE ?= ms-office-file-generator:local
+IMAGE ?= common-file-generator:local
 
 .DEFAULT_GOAL := help
 

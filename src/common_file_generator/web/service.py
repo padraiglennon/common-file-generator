@@ -19,7 +19,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from ms_office_file_generator.core import (
+from common_file_generator.core import (
     generate_deck,
     generate_doc,
     generate_markdown,

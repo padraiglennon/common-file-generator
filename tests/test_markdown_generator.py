@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from ms_office_file_generator.core import Complexity, generate_markdown
-from ms_office_file_generator.generators import MarkdownComplexityGenerator
+from common_file_generator.core import Complexity, generate_markdown
+from common_file_generator.generators import MarkdownComplexityGenerator
 
 _SECTION_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 

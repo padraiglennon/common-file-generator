@@ -8,8 +8,8 @@ import pytest
 from pptx import Presentation
 from pptx.enum.dml import MSO_FILL
 
-from ms_office_file_generator.core import Complexity, generate_deck
-from ms_office_file_generator.generators import PptxComplexityGenerator
+from common_file_generator.core import Complexity, generate_deck
+from common_file_generator.generators import PptxComplexityGenerator
 
 _SLIDE_W = 12192000  # 13.333 in, in EMU
 _SLIDE_H = 6858000  # 7.5 in, in EMU

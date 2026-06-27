@@ -3,9 +3,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^src/ms_office_file_generator/web/static/htmx\.min\.js$
+        exclude: ^src/common_file_generator/web/static/htmx\.min\.js$
       - id: end-of-file-fixer
-        exclude: ^src/ms_office_file_generator/web/static/htmx\.min\.js$
+        exclude: ^src/common_file_generator/web/static/htmx\.min\.js$
       - id: check-yaml
       - id: check-toml
       - id: check-added-large-files

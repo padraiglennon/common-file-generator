@@ -8,7 +8,7 @@ from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
 
-from ms_office_file_generator.core import Config, MediaSpec, TableSpec, generate
+from common_file_generator.core import Config, MediaSpec, TableSpec, generate
 
 
 def _config(image: Path) -> Config:

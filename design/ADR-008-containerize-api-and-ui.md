@@ -94,7 +94,7 @@ dependency.
 ### Publishing
 
 A GitHub Actions workflow builds and pushes to
-`ghcr.io/padraiglennon/ms-office-file-generator` using the repo's built-in
+`ghcr.io/padraiglennon/common-file-generator` using the repo's built-in
 `GITHUB_TOKEN` (no extra secrets):
 
 - push to `main` -> `:latest`
@@ -111,7 +111,7 @@ dependency surfaces in CI rather than in a consumer's pipeline.
 ### Positive
 
 - Consuming projects run the generator with `docker run -p 18990:18990
-  ghcr.io/padraiglennon/ms-office-file-generator` and hit both surfaces; no Python
+  ghcr.io/padraiglennon/common-file-generator` and hit both surfaces; no Python
   toolchain on their runners.
 - Local `docker compose up` (or `make docker-up`) reproduces the CI artifact
   exactly.

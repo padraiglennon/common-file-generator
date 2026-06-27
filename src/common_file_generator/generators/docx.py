@@ -19,8 +19,8 @@ from docx.enum.text import WD_BREAK
 from docx.shared import Inches
 from PIL import Image
 
-from ms_office_file_generator.core.complexity import Complexity, doc_block_pool
-from ms_office_file_generator.core.lorem import Lorem
+from common_file_generator.core.complexity import Complexity, doc_block_pool
+from common_file_generator.core.lorem import Lorem
 
 _USABLE_WIDTH = Inches(6.0)
 

@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from docx import Document
 
-from ms_office_file_generator.core import Complexity, generate_doc
-from ms_office_file_generator.generators import DocxComplexityGenerator
+from common_file_generator.core import Complexity, generate_doc
+from common_file_generator.generators import DocxComplexityGenerator
 
 
 def test_section_count_drives_headings(tmp_path: Path) -> None:

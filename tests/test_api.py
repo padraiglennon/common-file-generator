@@ -14,7 +14,7 @@ pytest.importorskip("fastapi")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from ms_office_file_generator.web.app import create_app  # noqa: E402
+from common_file_generator.web.app import create_app  # noqa: E402
 
 _OFFICE = "application/vnd.openxmlformats-officedocument"
 

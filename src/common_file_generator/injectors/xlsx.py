@@ -21,8 +21,8 @@ from openpyxl.drawing.image import Image as XLImage
 from openpyxl.utils.cell import coordinate_to_tuple, get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
-from ms_office_file_generator.core.config import Config, MediaSpec, TableSpec
-from ms_office_file_generator.core.injector import Injector
+from common_file_generator.core.config import Config, MediaSpec, TableSpec
+from common_file_generator.core.injector import Injector
 
 
 class XlsxInjector(Injector):

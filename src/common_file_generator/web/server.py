@@ -14,7 +14,7 @@ import os
 
 import uvicorn
 
-from ms_office_file_generator.web.app import create_app
+from common_file_generator.web.app import create_app
 
 _DEFAULT_HOST = "127.0.0.1"
 _DEFAULT_PORT = 18990
@@ -45,7 +45,7 @@ def _default_port() -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="gen-ui", description="Serve the Office file generator web UI."
+        prog="gen-ui", description="Serve the Common File Generator web UI."
     )
     parser.add_argument("--host", default=os.environ.get("MOFG_HOST", _DEFAULT_HOST))
     parser.add_argument("--port", type=int, default=_default_port())

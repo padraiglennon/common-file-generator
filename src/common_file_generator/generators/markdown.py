@@ -16,8 +16,8 @@ from __future__ import annotations
 import random
 from pathlib import Path
 
-from ms_office_file_generator.core.complexity import Complexity, doc_block_pool
-from ms_office_file_generator.core.lorem import Lorem
+from common_file_generator.core.complexity import Complexity, doc_block_pool
+from common_file_generator.core.lorem import Lorem
 
 # Extra content blocks per section, by complexity. Mirrors the docx generator so
 # section richness scales with complexity, not just which block types appear.

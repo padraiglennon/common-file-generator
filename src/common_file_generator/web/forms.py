@@ -12,7 +12,7 @@ import inspect
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ms_office_file_generator.core import (
+from common_file_generator.core import (
     Complexity,
     generate_deck,
     generate_doc,
@@ -20,7 +20,7 @@ from ms_office_file_generator.core import (
     generate_pdf,
     generate_sheet,
 )
-from ms_office_file_generator.generators.background import BackgroundMode
+from common_file_generator.generators.background import BackgroundMode
 
 
 @dataclass(frozen=True)

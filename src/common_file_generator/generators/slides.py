@@ -18,10 +18,10 @@ from pptx.enum.chart import XL_CHART_TYPE
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
 
-from ms_office_file_generator.core.lorem import Lorem
-from ms_office_file_generator.generators import style
-from ms_office_file_generator.generators.layout import Box
-from ms_office_file_generator.generators.theme import Theme
+from common_file_generator.core.lorem import Lorem
+from common_file_generator.generators import style
+from common_file_generator.generators.layout import Box
+from common_file_generator.generators.theme import Theme
 
 _CHART_TYPES = (
     XL_CHART_TYPE.COLUMN_CLUSTERED,

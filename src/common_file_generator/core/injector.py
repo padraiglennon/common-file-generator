@@ -11,8 +11,8 @@ from __future__ import annotations
 import abc
 from pathlib import Path
 
-from ms_office_file_generator.core.config import Config, load_config
-from ms_office_file_generator.core.report import Report
+from common_file_generator.core.config import Config, load_config
+from common_file_generator.core.report import Report
 
 
 class Injector(abc.ABC):
@@ -69,9 +69,9 @@ class Injector(abc.ABC):
 
 def _injector_registry() -> dict[str, type[Injector]]:
     # Imported lazily to avoid importing every Office library up front.
-    from ms_office_file_generator.injectors.docx import DocxInjector
-    from ms_office_file_generator.injectors.pptx import PptxInjector
-    from ms_office_file_generator.injectors.xlsx import XlsxInjector
+    from common_file_generator.injectors.docx import DocxInjector
+    from common_file_generator.injectors.pptx import PptxInjector
+    from common_file_generator.injectors.xlsx import XlsxInjector
 
     registry: dict[str, type[Injector]] = {}
     for cls in (PptxInjector, DocxInjector, XlsxInjector):

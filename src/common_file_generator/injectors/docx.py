@@ -19,9 +19,9 @@ from pathlib import Path
 from docx import Document
 from docx.table import Table
 
-from ms_office_file_generator.core.config import Config, MediaSpec, TableSpec
-from ms_office_file_generator.core.injector import Injector
-from ms_office_file_generator.injectors._text import (
+from common_file_generator.core.config import Config, MediaSpec, TableSpec
+from common_file_generator.core.injector import Injector
+from common_file_generator.injectors._text import (
     find_tokens,
     replace_in_paragraph,
 )

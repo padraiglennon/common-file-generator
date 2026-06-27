@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-logger = logging.getLogger("ms_office_file_generator")
+logger = logging.getLogger("common_file_generator")
 
 
 class Severity(Enum):

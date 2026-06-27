@@ -18,7 +18,7 @@ import logging
 import sys
 from pathlib import Path
 
-from ms_office_file_generator.core import (
+from common_file_generator.core import (
     DEFAULT_VIDEO_URL,
     Complexity,
     ConfigError,
@@ -34,7 +34,7 @@ from ms_office_file_generator.core import (
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="generate",
-        description="Produce test MS Office files by injection or generation.",
+        description="Produce test office/document files by injection or generation.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pptx import Presentation
 
-from ms_office_file_generator.core import Config, MediaSpec, TableSpec, generate
+from common_file_generator.core import Config, MediaSpec, TableSpec, generate
 
 
 def test_too_many_rows_truncates_and_warns(pptx_template: Path, tmp_path: Path) -> None:

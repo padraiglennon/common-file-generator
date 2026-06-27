@@ -12,7 +12,7 @@ from enum import Enum
 
 from pptx.dml.color import RGBColor
 
-from ms_office_file_generator.generators.theme import Theme
+from common_file_generator.generators.theme import Theme
 
 
 class BackgroundMode(Enum):

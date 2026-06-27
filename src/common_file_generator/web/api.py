@@ -7,7 +7,7 @@ template + config and streams the filled file with the injection report in the
 ``detail``; invalid bodies surface as Pydantic's ``422``.
 
 The router holds no generation logic: it validates, calls the shared service
-(:mod:`ms_office_file_generator.web.service`), and returns the bytes.
+(:mod:`common_file_generator.web.service`), and returns the bytes.
 """
 
 from __future__ import annotations
@@ -19,9 +19,9 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Response, UploadFile
 from fastapi.responses import JSONResponse
 
-from ms_office_file_generator.core import ConfigError, generate
-from ms_office_file_generator.web import service
-from ms_office_file_generator.web.schemas import (
+from common_file_generator.core import ConfigError, generate
+from common_file_generator.web import service
+from common_file_generator.web.schemas import (
     DeckRequest,
     DocRequest,
     SectionRequest,
@@ -33,7 +33,7 @@ _REPORT_HEADER = "X-Injection-Report"
 
 def create_api_router(*, max_upload_bytes: int) -> APIRouter:
     """Build the ``/api`` router. ``max_upload_bytes`` caps fill-mode uploads."""
-    from ms_office_file_generator.web.app import (
+    from common_file_generator.web.app import (
         _CONFIG_EXTS,
         _TEMPLATE_EXTS,
         _save_upload,

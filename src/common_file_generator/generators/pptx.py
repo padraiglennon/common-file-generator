@@ -23,13 +23,13 @@ from pathlib import Path
 from pptx import Presentation
 from pptx.util import Inches
 
-from ms_office_file_generator.core.complexity import Complexity, slide_pool
-from ms_office_file_generator.core.lorem import Lorem
-from ms_office_file_generator.generators import slides as slide_types
-from ms_office_file_generator.generators import style
-from ms_office_file_generator.generators.background import Background
-from ms_office_file_generator.generators.slides import SlideContext
-from ms_office_file_generator.generators.theme import DEFAULT_THEME
+from common_file_generator.core.complexity import Complexity, slide_pool
+from common_file_generator.core.lorem import Lorem
+from common_file_generator.generators import slides as slide_types
+from common_file_generator.generators import style
+from common_file_generator.generators.background import Background
+from common_file_generator.generators.slides import SlideContext
+from common_file_generator.generators.theme import DEFAULT_THEME
 
 _SLIDE_W = Inches(13.333)
 _SLIDE_H = Inches(7.5)

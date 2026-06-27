@@ -13,8 +13,8 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Pt
 
-from ms_office_file_generator.generators.layout import Box
-from ms_office_file_generator.generators.theme import Theme
+from common_file_generator.generators.layout import Box
+from common_file_generator.generators.theme import Theme
 
 
 def set_background(slide: object, color: RGBColor) -> None:

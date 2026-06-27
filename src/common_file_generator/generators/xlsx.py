@@ -23,8 +23,8 @@ from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
-from ms_office_file_generator.core.complexity import Complexity, sheet_feature_pool
-from ms_office_file_generator.core.lorem import Lorem
+from common_file_generator.core.complexity import Complexity, sheet_feature_pool
+from common_file_generator.core.lorem import Lorem
 
 _HEADER_FILL = "2E86C1"
 _CHART_KINDS = ("bar", "line", "pie")

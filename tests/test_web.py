@@ -15,8 +15,8 @@ pytest.importorskip("fastapi")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from ms_office_file_generator.web.app import create_app  # noqa: E402
-from ms_office_file_generator.web.forms import deck_fields  # noqa: E402
+from common_file_generator.web.app import create_app  # noqa: E402
+from common_file_generator.web.forms import deck_fields  # noqa: E402
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def test_every_deck_field_has_help_text() -> None:
 
 
 def test_fields_render_tooltips_and_required_markers(client) -> None:
-    from ms_office_file_generator.web.forms import (
+    from common_file_generator.web.forms import (
         doc_fields,
         md_fields,
         pdf_fields,
@@ -212,7 +212,7 @@ def test_generate_document_invalid_sections_errors(client) -> None:
 
 
 def test_doc_fields_track_the_core() -> None:
-    from ms_office_file_generator.web.forms import doc_fields
+    from common_file_generator.web.forms import doc_fields
 
     names = {f.name for f in doc_fields()}
     assert {"complexity", "sections", "seed"} == names
@@ -249,7 +249,7 @@ def test_generate_spreadsheet_invalid_sheets_errors(client) -> None:
 
 
 def test_sheet_fields_track_the_core() -> None:
-    from ms_office_file_generator.web.forms import sheet_fields
+    from common_file_generator.web.forms import sheet_fields
 
     names = {f.name for f in sheet_fields()}
     assert {"complexity", "sheets", "seed"} == names
@@ -310,14 +310,14 @@ def test_generate_markdown_invalid_sections_errors(client) -> None:
 
 
 def test_pdf_fields_track_the_core() -> None:
-    from ms_office_file_generator.web.forms import pdf_fields
+    from common_file_generator.web.forms import pdf_fields
 
     names = {f.name for f in pdf_fields()}
     assert {"complexity", "sections", "seed"} == names
 
 
 def test_md_fields_track_the_core() -> None:
-    from ms_office_file_generator.web.forms import md_fields
+    from common_file_generator.web.forms import md_fields
 
     names = {f.name for f in md_fields()}
     assert {"complexity", "sections", "seed"} == names
@@ -425,7 +425,7 @@ def test_expired_artifacts_are_swept() -> None:
 
 
 def test_server_defaults_to_localhost_18990() -> None:
-    from ms_office_file_generator.web.server import build_parser
+    from common_file_generator.web.server import build_parser
 
     args = build_parser().parse_args([])
     assert args.host == "127.0.0.1"
@@ -437,7 +437,7 @@ def test_server_env_overrides_max_upload(monkeypatch) -> None:
     monkeypatch.setenv("MOFG_MAX_UPLOAD_MB", "100")
     import importlib
 
-    from ms_office_file_generator.web import server
+    from common_file_generator.web import server
 
     importlib.reload(server)
     args = server.build_parser().parse_args([])
@@ -447,7 +447,7 @@ def test_server_env_overrides_max_upload(monkeypatch) -> None:
 
 
 def test_server_host_override() -> None:
-    from ms_office_file_generator.web.server import build_parser
+    from common_file_generator.web.server import build_parser
 
     args = build_parser().parse_args(["--host", "0.0.0.0", "--port", "9000"])
     assert args.host == "0.0.0.0"
@@ -459,7 +459,7 @@ def test_server_env_overrides_host_and_port(monkeypatch) -> None:
     monkeypatch.setenv("MOFG_PORT", "28990")
     import importlib
 
-    from ms_office_file_generator.web import server
+    from common_file_generator.web import server
 
     importlib.reload(server)
     args = server.build_parser().parse_args([])
@@ -477,7 +477,7 @@ def test_server_ignores_invalid_env_port(monkeypatch) -> None:
     monkeypatch.setenv("MOFG_PORT", "not-a-number")
     import importlib
 
-    from ms_office_file_generator.web import server
+    from common_file_generator.web import server
 
     importlib.reload(server)
     args = server.build_parser().parse_args([])

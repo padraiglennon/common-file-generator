@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from pypdf import PdfReader
 
-from ms_office_file_generator.core import Complexity, generate_pdf
-from ms_office_file_generator.generators import PdfComplexityGenerator
+from common_file_generator.core import Complexity, generate_pdf
+from common_file_generator.generators import PdfComplexityGenerator
 
 
 def test_creates_valid_pdf(tmp_path: Path) -> None:

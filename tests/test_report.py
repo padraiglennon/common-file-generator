@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ms_office_file_generator.core import Report, Severity
+from common_file_generator.core import Report, Severity
 
 
 def test_clean_report_has_no_problems() -> None:

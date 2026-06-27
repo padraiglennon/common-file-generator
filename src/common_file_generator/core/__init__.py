@@ -1,20 +1,20 @@
 """Core engine: config loading, validation, reporting, and the base injector."""
 
-from ms_office_file_generator.core.complexity import (
+from common_file_generator.core.complexity import (
     Complexity,
     doc_block_pool,
     sheet_feature_pool,
     slide_pool,
 )
-from ms_office_file_generator.core.config import (
+from common_file_generator.core.config import (
     Config,
     ConfigError,
     MediaSpec,
     TableSpec,
     load_config,
 )
-from ms_office_file_generator.core.injector import Injector, generate
-from ms_office_file_generator.core.report import Issue, Report, Severity
+from common_file_generator.core.injector import Injector, generate
+from common_file_generator.core.report import Issue, Report, Severity
 
 __all__ = [
     "Complexity",
@@ -62,13 +62,13 @@ def generate_deck(
     ``none`` / ``theme`` / ``random``; ``background_color`` is an explicit hex that
     overrides the mode with a single consistent colour.
     """
-    from ms_office_file_generator.generators import PptxComplexityGenerator
-    from ms_office_file_generator.generators.background import (
+    from common_file_generator.generators import PptxComplexityGenerator
+    from common_file_generator.generators.background import (
         Background,
         BackgroundMode,
         parse_hex,
     )
-    from ms_office_file_generator.generators.theme import DEFAULT_THEME
+    from common_file_generator.generators.theme import DEFAULT_THEME
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     bg = Background(
@@ -102,7 +102,7 @@ def generate_doc(
     future UI reuse the same core. ``blocks_per_section`` overrides the
     per-complexity default density.
     """
-    from ms_office_file_generator.generators import DocxComplexityGenerator
+    from common_file_generator.generators import DocxComplexityGenerator
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = DocxComplexityGenerator(
@@ -130,7 +130,7 @@ def generate_sheet(
     future UI reuse the same core. ``rows`` overrides the per-complexity table
     size; ``cols`` fixes the column count (default randomised per table).
     """
-    from ms_office_file_generator.generators import XlsxComplexityGenerator
+    from common_file_generator.generators import XlsxComplexityGenerator
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = XlsxComplexityGenerator(
@@ -154,7 +154,7 @@ def generate_pdf(
     UI reuse the same core. ``blocks_per_section`` overrides the per-complexity
     default density.
     """
-    from ms_office_file_generator.generators import PdfComplexityGenerator
+    from common_file_generator.generators import PdfComplexityGenerator
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = PdfComplexityGenerator(
@@ -181,7 +181,7 @@ def generate_markdown(
     UI reuse the same core. ``blocks_per_section`` overrides the per-complexity
     default density.
     """
-    from ms_office_file_generator.generators import MarkdownComplexityGenerator
+    from common_file_generator.generators import MarkdownComplexityGenerator
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = MarkdownComplexityGenerator(

@@ -1,4 +1,4 @@
-# ms-office-file-generator
+# common-file-generator
 
 Python tool for producing test sample files (PowerPoint, Word, Excel, PDF, and
 Markdown) for testing purposes.
@@ -187,7 +187,7 @@ the network (it is unauthenticated - your choice). The fill-mode upload size cap
 is set with `--max-upload-mb` or the `MOFG_MAX_UPLOAD_MB` env var (default 25).
 Generated files are temporary and swept after one hour.
 
-HTMX is vendored at `src/ms_office_file_generator/web/static/htmx.min.js` (see
+HTMX is vendored at `src/common_file_generator/web/static/htmx.min.js` (see
 `VENDOR.md` there for the pinned version and how to update it).
 
 ## JSON API
@@ -236,7 +236,7 @@ installing Python or the native dependencies.
 Pull and run the published image:
 
 ```bash
-docker run --rm -p 18990:18990 ghcr.io/padraiglennon/ms-office-file-generator:latest
+docker run --rm -p 18990:18990 ghcr.io/padraiglennon/common-file-generator:latest
 ```
 
 Then the UI is at <http://localhost:18990> and the API under
@@ -250,7 +250,7 @@ To use a different in-container port, set `MOFG_PORT` and map it to match:
 
 ```bash
 docker run --rm -e MOFG_PORT=9100 -p 9100:9100 \
-  ghcr.io/padraiglennon/ms-office-file-generator:latest
+  ghcr.io/padraiglennon/common-file-generator:latest
 ```
 
 Build and run locally instead of pulling:

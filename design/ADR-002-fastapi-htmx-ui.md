@@ -87,7 +87,7 @@ Fill-mode uploads are constrained:
 ### Project layout
 
 ```text
-src/ms_office_file_generator/web/
+src/common_file_generator/web/
   __init__.py
   app.py            # FastAPI app + routes
   forms.py          # introspect core -> labelled form schema

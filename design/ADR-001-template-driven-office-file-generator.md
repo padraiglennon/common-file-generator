@@ -160,7 +160,7 @@ throughout, `src/` layout, tests under `tests/`.
 
 ```text
 pyproject.toml                       # uv project; [project.scripts] entry point
-src/ms_office_file_generator/
+src/common_file_generator/
   core/                              # config, JSON schema, validation, reporting,
                                      #   base Injector, complexity pool, lorem
   injectors/                         # inject mode: pptx.py, docx.py, xlsx.py

@@ -34,8 +34,8 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-from ms_office_file_generator.core.complexity import Complexity, doc_block_pool
-from ms_office_file_generator.core.lorem import Lorem
+from common_file_generator.core.complexity import Complexity, doc_block_pool
+from common_file_generator.core.lorem import Lorem
 
 # Letter page (8.5") minus the SimpleDocTemplate default 1" margins each side.
 _USABLE_WIDTH = 6.5 * inch

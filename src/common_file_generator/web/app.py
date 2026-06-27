@@ -18,9 +18,9 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from ms_office_file_generator.core import ConfigError, generate
-from ms_office_file_generator.web import service
-from ms_office_file_generator.web.forms import (
+from common_file_generator.core import ConfigError, generate
+from common_file_generator.web import service
+from common_file_generator.web.forms import (
     deck_fields,
     doc_fields,
     md_fields,
@@ -55,7 +55,7 @@ def create_app(
     ``max_upload_mb`` caps fill-mode uploads; ``ttl_seconds`` is how long a
     generated file is kept before it is swept on the next request.
     """
-    app = FastAPI(title="Office file generator")
+    app = FastAPI(title="Common File Generator")
     templates = Jinja2Templates(directory=str(_HERE / "templates"))
     app.mount("/static", StaticFiles(directory=str(_HERE / "static")), name="static")
 
@@ -212,7 +212,7 @@ def create_app(
         token = _store(out, f"filled{template_path.suffix}")
         return _result(templates, request, token, out.name, report=report.render())
 
-    from ms_office_file_generator.web.api import create_api_router
+    from common_file_generator.web.api import create_api_router
 
     app.include_router(create_api_router(max_upload_bytes=max_upload_bytes))
 
@@ -270,7 +270,7 @@ async def _save_upload(
 
 
 def _video_default() -> str:
-    from ms_office_file_generator.core import DEFAULT_VIDEO_URL
+    from common_file_generator.core import DEFAULT_VIDEO_URL
 
     return DEFAULT_VIDEO_URL
 

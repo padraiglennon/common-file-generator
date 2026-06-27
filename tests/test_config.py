@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from ms_office_file_generator.core import ConfigError, load_config
+from common_file_generator.core import ConfigError, load_config
 
 
 def _write(tmp_path: Path, data: object) -> Path:

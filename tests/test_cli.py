@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pptx import Presentation
 
-from ms_office_file_generator.cli import main
+from common_file_generator.cli import main
 
 
 def _config_file(tmp_path: Path, data: dict) -> Path:

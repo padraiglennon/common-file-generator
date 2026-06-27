@@ -6,7 +6,7 @@
 services:
   generator:
     build: .
-    image: ms-office-file-generator:local
+    image: common-file-generator:local
     ports:
       - "18990:18990"
     healthcheck:

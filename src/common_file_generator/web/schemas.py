@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from ms_office_file_generator.core import Complexity
+from common_file_generator.core import Complexity
 
 
 class DeckRequest(BaseModel):
