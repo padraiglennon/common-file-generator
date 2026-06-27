@@ -46,6 +46,12 @@ def _token(html: str) -> str:
     return match.group(1)
 
 
+def test_health_returns_ok(client) -> None:
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    assert resp.json() == {"status": "ok"}
+
+
 def test_index_renders_introspected_fields(client) -> None:
     resp = client.get("/")
     assert resp.status_code == 200
@@ -446,3 +452,35 @@ def test_server_host_override() -> None:
     args = build_parser().parse_args(["--host", "0.0.0.0", "--port", "9000"])
     assert args.host == "0.0.0.0"
     assert args.port == 9000
+
+
+def test_server_env_overrides_host_and_port(monkeypatch) -> None:
+    monkeypatch.setenv("MOFG_HOST", "0.0.0.0")
+    monkeypatch.setenv("MOFG_PORT", "28990")
+    import importlib
+
+    from ms_office_file_generator.web import server
+
+    importlib.reload(server)
+    args = server.build_parser().parse_args([])
+    assert args.host == "0.0.0.0"
+    assert args.port == 28990
+    # An explicit flag still wins over the environment.
+    flagged = server.build_parser().parse_args(["--port", "9000"])
+    assert flagged.port == 9000
+    monkeypatch.delenv("MOFG_HOST")
+    monkeypatch.delenv("MOFG_PORT")
+    importlib.reload(server)
+
+
+def test_server_ignores_invalid_env_port(monkeypatch) -> None:
+    monkeypatch.setenv("MOFG_PORT", "not-a-number")
+    import importlib
+
+    from ms_office_file_generator.web import server
+
+    importlib.reload(server)
+    args = server.build_parser().parse_args([])
+    assert args.port == 18990  # falls back to the default
+    monkeypatch.delenv("MOFG_PORT")
+    importlib.reload(server)

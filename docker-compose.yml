@@ -1,0 +1,17 @@
+# Local development: `docker compose up --build` builds from the local
+# Dockerfile and serves the UI (/) and JSON API (/api) on http://localhost:18990.
+# Runs the baked-in copy of the code (no source mount) so the local container is
+# the same artifact CI consumes; rebuild to pick up source changes.
+
+services:
+  generator:
+    build: .
+    image: ms-office-file-generator:local
+    ports:
+      - "18990:18990"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request,sys; sys.exit(0 if urllib.request.urlopen(f\"http://127.0.0.1:{os.environ.get('MOFG_PORT','18990')}/health\").status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s

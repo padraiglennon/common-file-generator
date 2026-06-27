@@ -227,6 +227,41 @@ The API is unauthenticated and local-first, like the UI; counts are not yet
 upper-bounded. Authentication, hosted deployment, and resource caps are tracked
 for a future ADR.
 
+## Run in Docker
+
+The UI and JSON API are the same FastAPI app, so a single container serves both.
+This is the easiest way to use the generator from another project's CI without
+installing Python or the native dependencies.
+
+Pull and run the published image:
+
+```bash
+docker run --rm -p 18990:18990 ghcr.io/padraiglennon/ms-office-file-generator:latest
+```
+
+Then the UI is at <http://localhost:18990> and the API under
+`http://localhost:18990/api`. `GET /health` returns `200 {"status":"ok"}` once
+the service is ready, so CI can poll it before sending requests. Pin a released
+tag (e.g. `:v0.1.0`) for reproducible builds. The image is multi-arch
+(linux/amd64 + linux/arm64). The container binds `0.0.0.0` and is
+unauthenticated - run it only on a trusted/isolated network.
+
+To use a different in-container port, set `MOFG_PORT` and map it to match:
+
+```bash
+docker run --rm -e MOFG_PORT=9100 -p 9100:9100 \
+  ghcr.io/padraiglennon/ms-office-file-generator:latest
+```
+
+Build and run locally instead of pulling:
+
+```bash
+docker compose up --build      # or: make docker-up
+```
+
+This builds from the local `Dockerfile` and runs the same image CI consumes
+(no source mount - rebuild to pick up code changes).
+
 ## Develop
 
 ```bash
@@ -235,6 +270,9 @@ uv run pytest          # tests
 uv run ruff check .    # lint
 uv run pre-commit install   # enable pre-commit hooks
 ```
+
+Common actions are wrapped in the `Makefile` - run `make help` to list them
+(`make test`, `make lint`, `make format`, `make serve`, `make docker-build`, ...).
 
 ## Design
 
@@ -245,3 +283,5 @@ Architecture decision records:
 - [ADR-002](design/ADR-002-fastapi-htmx-ui.md) - the FastAPI + HTMX web UI.
 - [ADR-007](design/ADR-007-json-api-file-generation.md) - the JSON API for
   programmatic file generation.
+- [ADR-008](design/ADR-008-containerize-api-and-ui.md) - containerizing the API
+  and UI for CI and local development.

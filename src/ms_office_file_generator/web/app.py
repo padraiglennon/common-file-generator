@@ -79,6 +79,11 @@ def create_app(
 
     asset_version = secrets.token_hex(4)  # busts the CSS cache each server start
 
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        # Lightweight readiness probe for the container HEALTHCHECK and CI polling.
+        return {"status": "ok"}
+
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request) -> HTMLResponse:
         return templates.TemplateResponse(

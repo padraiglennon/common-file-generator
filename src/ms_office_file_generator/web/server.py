@@ -2,8 +2,9 @@
 
 Binds 127.0.0.1:18990 by default so the UI is not exposed on the network by
 accident. Pass ``--host 0.0.0.0`` to expose it (unauthenticated; your choice).
-The upload size cap is configurable via ``--max-upload-mb`` or the
-``MOFG_MAX_UPLOAD_MB`` environment variable.
+Host and port also read from ``MOFG_HOST`` / ``MOFG_PORT`` (the container sets
+``MOFG_HOST=0.0.0.0``); the upload size cap from ``--max-upload-mb`` or
+``MOFG_MAX_UPLOAD_MB``. Explicit flags win over the environment.
 """
 
 from __future__ import annotations
@@ -31,12 +32,23 @@ def _default_max_upload_mb() -> int:
     return value if value > 0 else _DEFAULT_MAX_UPLOAD_MB
 
 
+def _default_port() -> int:
+    raw = os.environ.get("MOFG_PORT")
+    if raw is None:
+        return _DEFAULT_PORT
+    try:
+        value = int(raw)
+    except ValueError:
+        return _DEFAULT_PORT
+    return value if 0 < value <= 65535 else _DEFAULT_PORT
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gen-ui", description="Serve the Office file generator web UI."
     )
-    parser.add_argument("--host", default=_DEFAULT_HOST)
-    parser.add_argument("--port", type=int, default=_DEFAULT_PORT)
+    parser.add_argument("--host", default=os.environ.get("MOFG_HOST", _DEFAULT_HOST))
+    parser.add_argument("--port", type=int, default=_default_port())
     parser.add_argument(
         "--max-upload-mb",
         type=int,

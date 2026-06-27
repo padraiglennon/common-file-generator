@@ -4,6 +4,7 @@
 UV ?= uv
 HOST ?= 127.0.0.1
 PORT ?= 18990
+IMAGE ?= ms-office-file-generator:local
 
 .DEFAULT_GOAL := help
 
@@ -63,6 +64,18 @@ pre-commit: ## Run all pre-commit hooks on all files
 .PHONY: build
 build: ## Build the wheel
 	$(UV) build --wheel
+
+.PHONY: docker-build
+docker-build: ## Build the container image
+	docker build -t $(IMAGE) .
+
+.PHONY: docker-up
+docker-up: ## Build and run the service in the foreground (UI + API on PORT)
+	docker compose up --build
+
+.PHONY: docker-down
+docker-down: ## Stop and remove the running service
+	docker compose down
 
 .PHONY: clean
 clean: ## Remove build artifacts and caches
