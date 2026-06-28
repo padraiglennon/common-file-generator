@@ -94,8 +94,8 @@ _COMPLEXITY_LABELS: dict[str, str] = {
     "maximum": "Maximum",
 }
 
-# Metadata for the Word document form (generate_doc parameters).
-_DOC_FIELD_META: dict[str, tuple[str, str, str]] = {
+# Metadata shared by the section-based forms (Word, PDF, Markdown).
+_SECTION_FIELD_META: dict[str, tuple[str, str, str]] = {
     "complexity": (
         "Complexity",
         "select",
@@ -112,6 +112,24 @@ _DOC_FIELD_META: dict[str, tuple[str, str, str]] = {
         "Pick any number. The same number makes the same document every time; "
         "change it for a different one.",
     ),
+}
+
+# The Word form adds a theme select (Word-only). PDF and Markdown keep the plain
+# section shape so the theme field never appears on them.
+_DOC_FIELD_META: dict[str, tuple[str, str, str]] = {
+    **_SECTION_FIELD_META,
+    "theme": (
+        "Style theme",
+        "select",
+        "The colours and fonts used for headings, body text, tables and quotes.",
+    ),
+}
+
+# Friendly labels for the Word theme select.
+_THEME_LABELS: dict[str, str] = {
+    "ocean": "Ocean (blue / teal)",
+    "slate": "Slate (grey / charcoal)",
+    "sand": "Sand (cream / brown)",
 }
 
 # Metadata for the Excel workbook form (generate_sheet parameters).
@@ -159,15 +177,16 @@ def sheet_fields() -> list[Field]:
 def pdf_fields() -> list[Field]:
     """Return the PDF form fields, derived from ``generate_pdf``'s signature.
 
-    PDF and Markdown share Word's section/complexity/seed shape, so they reuse
-    ``_DOC_FIELD_META`` rather than duplicate it.
+    PDF and Markdown share Word's section/complexity/seed shape but not its
+    theme field, so they reuse ``_SECTION_FIELD_META`` (no theme) rather than the
+    Word-only ``_DOC_FIELD_META``.
     """
-    return _fields_from(generate_pdf, _DOC_FIELD_META)
+    return _fields_from(generate_pdf, _SECTION_FIELD_META)
 
 
 def md_fields() -> list[Field]:
     """Return the Markdown form fields, derived from ``generate_markdown``."""
-    return _fields_from(generate_markdown, _DOC_FIELD_META)
+    return _fields_from(generate_markdown, _SECTION_FIELD_META)
 
 
 def _fields_from(func: object, meta: dict[str, tuple[str, str, str]]) -> list[Field]:
@@ -190,6 +209,10 @@ def _fields_from(func: object, meta: dict[str, tuple[str, str, str]]) -> list[Fi
 
 
 def _choices_for(name: str) -> tuple[Choice, ...]:
+    if name == "theme":
+        from common_file_generator.generators.docx_theme import THEMES
+
+        return tuple(Choice(value=v, label=_THEME_LABELS.get(v, v)) for v in THEMES)
     enum = _ENUM_CHOICES.get(name)
     if enum is None:
         return ()

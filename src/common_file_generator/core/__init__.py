@@ -94,15 +94,18 @@ def generate_doc(
     sections: int = 5,
     seed: int = 0,
     blocks_per_section: int | None = None,
+    theme: str = "ocean",
 ) -> str:
     """Generate a complexity-driven Word document and write it to ``out``.
 
     Generate mode for Word: builds a ``.docx`` from scratch (distinct from
     :func:`generate`, which injects into a template). Kept here so the CLI and a
     future UI reuse the same core. ``blocks_per_section`` overrides the
-    per-complexity default density.
+    per-complexity default density. ``theme`` selects an in-code Word theme
+    (``ocean`` / ``slate`` / ``sand``); an unknown name raises ``ValueError``.
     """
     from common_file_generator.generators import DocxComplexityGenerator
+    from common_file_generator.generators.docx_theme import resolve_theme
 
     level = complexity if isinstance(complexity, Complexity) else Complexity(complexity)
     generator = DocxComplexityGenerator(
@@ -110,6 +113,7 @@ def generate_doc(
         sections=sections,
         seed=seed,
         blocks_per_section=blocks_per_section,
+        theme=resolve_theme(theme),
     )
     return str(generator.save(out))
 

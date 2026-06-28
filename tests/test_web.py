@@ -210,6 +210,21 @@ def test_generate_document_returns_downloadable_docx(client) -> None:
     assert len(doc.paragraphs) > 0
 
 
+def test_generate_document_applies_selected_theme(client) -> None:
+    from docx import Document
+
+    from common_file_generator.generators.docx_theme import SLATE
+
+    resp = client.post(
+        "/generate/doc",
+        data={"complexity": "standard", "sections": "3", "seed": "2", "theme": "slate"},
+    )
+    assert resp.status_code == 200
+    download = client.get(f"/download/{_token(resp.text)}")
+    doc = Document(io.BytesIO(download.content))
+    assert str(doc.styles["Heading 1"].font.color.rgb) == str(SLATE.heading_color)
+
+
 def test_generate_document_invalid_sections_errors(client) -> None:
     resp = client.post(
         "/generate/doc",
@@ -243,7 +258,23 @@ def test_doc_fields_track_the_core() -> None:
     from common_file_generator.web.forms import doc_fields
 
     names = {f.name for f in doc_fields()}
-    assert {"complexity", "sections", "seed"} == names
+    assert {"complexity", "sections", "seed", "theme"} == names
+
+
+def test_doc_theme_field_offers_the_three_themes() -> None:
+    from common_file_generator.generators.docx_theme import THEMES
+    from common_file_generator.web.forms import doc_fields
+
+    theme_field = next(f for f in doc_fields() if f.name == "theme")
+    assert theme_field.kind == "select"
+    assert {c.value for c in theme_field.choices} == set(THEMES)
+
+
+def test_pdf_and_md_forms_have_no_theme_field() -> None:
+    from common_file_generator.web.forms import md_fields, pdf_fields
+
+    assert "theme" not in {f.name for f in pdf_fields()}
+    assert "theme" not in {f.name for f in md_fields()}
 
 
 def test_index_has_spreadsheet_tab(client) -> None:

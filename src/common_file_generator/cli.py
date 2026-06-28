@@ -29,6 +29,7 @@ from common_file_generator.core import (
     generate_pdf,
     generate_sheet,
 )
+from common_file_generator.generators.docx_theme import THEMES as DOCX_THEMES
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -86,6 +87,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     doc = _add_section_parser(
         sub, "doc", "Generate a complex Word document from scratch."
+    )
+    doc.add_argument(
+        "--theme",
+        choices=sorted(DOCX_THEMES),
+        default="ocean",
+        help="Word styling theme (colours + fonts). Word-only.",
     )
     doc.set_defaults(func=_run_doc)
 
@@ -209,6 +216,7 @@ def _run_doc(args: argparse.Namespace) -> int:
             sections=args.sections,
             seed=args.seed,
             blocks_per_section=args.blocks_per_section,
+            theme=args.theme,
         )
     except ValueError as exc:
         print(f"Could not generate the document: {exc}", file=sys.stderr)

@@ -17,6 +17,8 @@ surface as ``422``.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 from common_file_generator.core import Complexity
@@ -34,12 +36,18 @@ class DeckRequest(BaseModel):
 
 
 class DocRequest(BaseModel):
-    """Parameters for ``POST /api/generate/doc``."""
+    """Parameters for ``POST /api/generate/doc``.
+
+    ``theme`` is constrained to the valid Word themes, so a bad value is rejected
+    as ``422`` rather than reaching the core. A drift test keeps this literal in
+    sync with ``docx_theme.THEMES``.
+    """
 
     complexity: Complexity = Complexity.STANDARD
     sections: int = 5
     seed: int = 0
     blocks_per_section: int | None = None
+    theme: Literal["ocean", "slate", "sand"] = "ocean"
 
 
 class SheetRequest(BaseModel):

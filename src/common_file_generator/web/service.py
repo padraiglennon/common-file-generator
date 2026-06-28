@@ -84,7 +84,7 @@ _KINDS: dict[str, FileKind] = {
     "doc": FileKind(
         key="doc",
         builder=generate_doc,
-        params=("complexity", "sections", "seed", "blocks_per_section"),
+        params=("complexity", "sections", "seed", "blocks_per_section", "theme"),
         suffix=".docx",
         media_type=f"{_OFFICE}.wordprocessingml.document",
         download_name="document.docx",

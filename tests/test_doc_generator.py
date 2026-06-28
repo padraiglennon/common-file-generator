@@ -94,5 +94,90 @@ def test_tables_fit_the_page_width(tmp_path: Path) -> None:
         assert total <= usable + 12700
 
 
+def test_each_theme_styles_headings_body_and_quote(tmp_path: Path) -> None:
+    from common_file_generator.generators.docx_theme import THEMES
+
+    for name, theme in THEMES.items():
+        out = tmp_path / f"{name}.docx"
+        generate_doc(str(out), complexity="standard", sections=4, seed=1, theme=name)
+        doc = Document(str(out))
+        assert str(doc.styles["Heading 1"].font.color.rgb) == str(theme.heading_color)
+        assert str(doc.styles["Title"].font.color.rgb) == str(theme.heading_color)
+        assert str(doc.styles["Normal"].font.color.rgb) == str(theme.body_color)
+        assert str(doc.styles["Intense Quote"].font.color.rgb) == str(
+            theme.accent_color
+        )
+
+
+def test_themes_are_visibly_distinct(tmp_path: Path) -> None:
+    headings = set()
+    for name in ("ocean", "slate", "sand"):
+        out = tmp_path / f"{name}.docx"
+        generate_doc(str(out), complexity="standard", sections=3, seed=1, theme=name)
+        headings.add(str(Document(str(out)).styles["Heading 1"].font.color.rgb))
+    assert len(headings) == 3
+
+
+def test_table_header_is_shaded_with_theme_fill(tmp_path: Path) -> None:
+    from docx.oxml.ns import qn
+
+    from common_file_generator.generators.docx_theme import SAND
+
+    out = tmp_path / "d.docx"
+    generate_doc(str(out), complexity="maximum", sections=20, seed=5, theme="sand")
+    doc = Document(str(out))
+    assert doc.tables  # maximum produces tables
+    header_cell = doc.tables[0].cell(0, 0)._tc
+    shd = header_cell.find(qn("w:tcPr")).find(qn("w:shd"))
+    assert shd.get(qn("w:fill")) == str(SAND.table_header_fill)
+
+
+def test_default_theme_is_ocean(tmp_path: Path) -> None:
+    from common_file_generator.generators.docx_theme import OCEAN
+
+    default_out, ocean_out = tmp_path / "def.docx", tmp_path / "ocean.docx"
+    generate_doc(str(default_out), complexity="complex", sections=6, seed=9)
+    generate_doc(
+        str(ocean_out), complexity="complex", sections=6, seed=9, theme="ocean"
+    )
+    assert _content(default_out) == _content(ocean_out)
+    assert str(Document(str(default_out)).styles["Heading 1"].font.color.rgb) == str(
+        OCEAN.heading_color
+    )
+
+
+def test_theme_preserves_determinism(tmp_path: Path) -> None:
+    # The .docx is a zip whose entries carry a save-time timestamp, so raw bytes
+    # can differ across a clock tick. Determinism is over content: same
+    # (theme, complexity, sections, seed) -> identical zip-member bytes.
+    a, b = tmp_path / "a.docx", tmp_path / "b.docx"
+    generate_doc(str(a), complexity="complex", sections=8, seed=42, theme="slate")
+    generate_doc(str(b), complexity="complex", sections=8, seed=42, theme="slate")
+    assert _content(a) == _content(b)
+
+
+def test_unknown_theme_raises_listing_valid_names() -> None:
+    with pytest.raises(ValueError, match="ocean, sand, slate"):
+        generate_doc("unused.docx", theme="neon")
+
+
+def test_ocean_mirrors_the_pptx_palette() -> None:
+    """Drift guard: the mirrored ocean hexes must match the PPTX OCEAN theme."""
+    from common_file_generator.generators.docx_theme import OCEAN
+    from common_file_generator.generators.theme import OCEAN as PPTX_OCEAN
+
+    assert str(OCEAN.heading_color) == str(PPTX_OCEAN.primary)
+    assert str(OCEAN.accent_color) == str(PPTX_OCEAN.accent)
+    assert str(OCEAN.body_color) == str(PPTX_OCEAN.body_color)
+
+
 def _texts(path: Path) -> list[str]:
     return [p.text for p in Document(str(path)).paragraphs]
+
+
+def _content(path: Path) -> dict[str, bytes]:
+    """The .docx's zip-member bytes, ignoring per-save entry timestamps."""
+    import zipfile
+
+    with zipfile.ZipFile(path) as zf:
+        return {name: zf.read(name) for name in sorted(zf.namelist())}

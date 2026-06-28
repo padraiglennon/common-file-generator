@@ -162,9 +162,15 @@ def create_app(
         complexity: str = Form("standard"),
         sections: int = Form(5),
         seed: int = Form(0),
+        theme: str = Form("ocean"),
     ) -> HTMLResponse:
         return _generate(
-            request, "doc", complexity=complexity, sections=sections, seed=seed
+            request,
+            "doc",
+            complexity=complexity,
+            sections=sections,
+            seed=seed,
+            theme=theme,
         )
 
     @app.post("/generate/sheet", response_class=HTMLResponse)

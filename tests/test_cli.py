@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from pptx import Presentation
 
 from common_file_generator.cli import main
@@ -94,6 +95,25 @@ def test_doc_success(tmp_path: Path) -> None:
 def test_doc_invalid_sections_exits_2(tmp_path: Path) -> None:
     code = main(["doc", "--out", str(tmp_path / "d.docx"), "--sections", "0"])
     assert code == 2
+
+
+def test_doc_theme_applies_chosen_palette(tmp_path: Path) -> None:
+    from docx import Document
+
+    from common_file_generator.generators.docx_theme import SAND
+
+    out = tmp_path / "sand.docx"
+    code = main(["doc", "--out", str(out), "--sections", "3", "--theme", "sand"])
+    assert code == 0
+    assert str(Document(str(out)).styles["Heading 1"].font.color.rgb) == str(
+        SAND.heading_color
+    )
+
+
+def test_doc_rejects_unknown_theme(tmp_path: Path, capsys) -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["doc", "--out", str(tmp_path / "d.docx"), "--theme", "neon"])
+    assert exc.value.code == 2  # argparse rejects an invalid choice
 
 
 def test_sheet_success(tmp_path: Path) -> None:

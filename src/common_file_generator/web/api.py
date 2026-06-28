@@ -132,6 +132,7 @@ def create_api_router(*, max_upload_bytes: int, caps: Caps) -> APIRouter:
             sections=body.sections,
             seed=body.seed,
             blocks_per_section=body.blocks_per_section,
+            theme=body.theme,
         )
 
     @router.post("/generate/sheet")

@@ -108,6 +108,37 @@ def test_minimal_body_uses_defaults(client) -> None:
     assert len(resp.content) > 0
 
 
+def test_doc_theme_streams_themed_docx(client) -> None:
+    from docx import Document
+
+    from common_file_generator.generators.docx_theme import SLATE
+
+    resp = client.post(
+        "/api/generate/doc",
+        json={"complexity": "standard", "sections": 3, "seed": 2, "theme": "slate"},
+    )
+    assert resp.status_code == 200
+    doc = Document(io.BytesIO(resp.content))
+    assert str(doc.styles["Heading 1"].font.color.rgb) == str(SLATE.heading_color)
+
+
+def test_unknown_theme_returns_422(client) -> None:
+    # A bad theme is a request-shape error (rejected by the schema), not a 500.
+    resp = client.post("/api/generate/doc", json={"theme": "neon"})
+    assert resp.status_code == 422
+
+
+def test_doc_request_theme_literal_tracks_themes() -> None:
+    # Drift guard: the schema's allowed theme set must match the generator's.
+    from typing import get_args
+
+    from common_file_generator.generators.docx_theme import THEMES
+    from common_file_generator.web.schemas import DocRequest
+
+    allowed = set(get_args(DocRequest.model_fields["theme"].annotation))
+    assert allowed == set(THEMES)
+
+
 def test_invalid_complexity_returns_422(client) -> None:
     resp = client.post("/api/generate/doc", json={"complexity": "nonsense"})
     assert resp.status_code == 422

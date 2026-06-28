@@ -16,11 +16,13 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_BREAK
+from docx.oxml.ns import qn
 from docx.shared import Inches
 from PIL import Image
 
 from common_file_generator.core.complexity import Complexity, doc_block_pool
 from common_file_generator.core.lorem import Lorem
+from common_file_generator.generators.docx_theme import DEFAULT_DOCX_THEME, DocxTheme
 
 _USABLE_WIDTH = Inches(6.0)
 
@@ -45,12 +47,14 @@ class DocxComplexityGenerator:
         sections: int = 5,
         seed: int = 0,
         blocks_per_section: int | None = None,
+        theme: DocxTheme = DEFAULT_DOCX_THEME,
     ) -> None:
         if sections < 1:
             raise ValueError("sections must be at least 1")
         if blocks_per_section is not None and blocks_per_section < 1:
             raise ValueError("blocks_per_section must be at least 1")
         self.complexity = complexity
+        self.theme = theme
         self.sections = sections
         self.blocks_per_section = (
             blocks_per_section
@@ -65,10 +69,32 @@ class DocxComplexityGenerator:
 
     def build(self) -> Document:
         document = Document()
+        self._apply_theme(document)
         document.add_heading(self._lorem.title(6), level=0)  # document title
         for index in range(1, self.sections + 1):
             self._add_section(document, index)
         return document
+
+    # --- theming --------------------------------------------------------
+
+    def _apply_theme(self, document: Document) -> None:
+        """Restyle the built-in styles once, before any section is drawn.
+
+        Every heading/body/list/quote the generator adds inherits from these
+        built-in styles, so styling them here themes the whole document.
+        """
+        theme = self.theme
+        normal = document.styles["Normal"]
+        normal.font.name = theme.body_font
+        normal.font.color.rgb = theme.body_color
+        # The document title is the built-in ``Title`` style (add_heading level 0);
+        # sections use ``Heading 1`` / ``Heading 2``.
+        for style_name in ("Title", "Heading 1", "Heading 2"):
+            heading = document.styles[style_name]
+            heading.font.name = theme.title_font
+            heading.font.color.rgb = theme.heading_color
+        quote = document.styles["Intense Quote"]
+        quote.font.color.rgb = theme.accent_color
 
     def save(self, out_path: str | Path) -> Path:
         out_path = Path(out_path)
@@ -106,13 +132,27 @@ class DocxComplexityGenerator:
         table.autofit = False
         width = Inches(_USABLE_WIDTH.inches / cols)
         for c in range(cols):
-            table.cell(0, c).text = self._lorem.title(2)
+            self._fill_header_cell(table.cell(0, c), self._lorem.title(2))
         for r in range(1, rows):
             for c in range(cols):
                 table.cell(r, c).text = self._lorem.words(self._rng.randint(1, 3))
         for row in table.rows:
             for cell in row.cells:
                 cell.width = width
+
+    def _fill_header_cell(self, cell: object, text: str) -> None:
+        """Write a header cell with the theme's fill shading and text colour."""
+        cell.text = text
+        tc_pr = cell._tc.get_or_add_tcPr()
+        shading = tc_pr.makeelement(
+            qn("w:shd"),
+            {qn("w:val"): "clear", qn("w:fill"): str(self.theme.table_header_fill)},
+        )
+        tc_pr.append(shading)
+        for paragraph in cell.paragraphs:
+            for run in paragraph.runs:
+                run.font.bold = True
+                run.font.color.rgb = self.theme.table_header_text
 
     def _add_image(self, document: Document) -> None:
         document.add_picture(self._placeholder_png(), width=Inches(4.5))
