@@ -228,3 +228,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local docker-compose override (dev source-mount + autoreload; machine-specific).
+docker-compose.override.yml
