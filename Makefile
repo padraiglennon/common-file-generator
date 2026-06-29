@@ -42,6 +42,16 @@ doc: ## Generate a sample 20-section maximum Word document into output/
 sheet: ## Generate a sample 5-sheet maximum Excel workbook into output/
 	$(UV) run generate sheet --out output/workbook.xlsx --complexity maximum --sheets 5
 
+.PHONY: screenshots
+screenshots: ## Capture web-UI screenshots into docs/ (needs `playwright install chromium`)
+	$(UV) sync --extra shots --extra web
+	$(UV) run playwright install chromium
+	$(UV) run python scripts/capture_screenshots.py
+
+.PHONY: docs
+docs: ## Build the docs site with mkdocs (strict)
+	$(UV) run --extra docs mkdocs build --strict
+
 .PHONY: test
 test: ## Run the test suite
 	$(UV) run pytest

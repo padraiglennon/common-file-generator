@@ -15,6 +15,9 @@ theme:
 
 nav:
   - Home: index.md
+  - Getting started: getting-started.md
+  - Web UI walkthrough: ui-walkthrough.md
+  - How it works: how-it-works.md
   - Guides:
       - Golden templates: golden-file-guide.md
       - Data file (JSON): config-guide.md

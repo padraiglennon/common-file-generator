@@ -26,6 +26,12 @@ docs = [
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.5.0",
 ]
+# UI screenshot capture for the docs (ADR-014). A separate extra so a plain docs
+# build never pulls the browser toolchain. Capturing drives the live UI, so it
+# also needs the `web` extra, plus a one-time `playwright install chromium`.
+shots = [
+    "playwright>=1.44.0",
+]
 
 [project.scripts]
 generate = "common_file_generator.cli:main"

@@ -8,6 +8,14 @@ JSON API.
 When the web service is running, an interactive API reference is served at
 `/docs` (Swagger) and `/redoc`.
 
+## Start here
+
+- [Getting started](getting-started.md) - install, then generate from the CLI,
+  the web UI, and the JSON API, end to end.
+- [Web UI walkthrough](ui-walkthrough.md) - a screenshot tour of every screen.
+- [How it works](how-it-works.md) - the two modes, the complexity model, and the
+  architecture.
+
 ## Guides
 
 - [Preparing a Golden template](golden-file-guide.md) - marking up the text,
