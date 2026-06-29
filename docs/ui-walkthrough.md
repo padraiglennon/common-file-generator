@@ -24,8 +24,7 @@ slide **background**. Choosing *Custom colour* reveals a colour picker.
 ## Generate a document
 
 Build a Word `.docx`. Choose complexity, the number of **sections**, a variation
-number, and a **theme** (the themed styling from
-[ADR-012](https://github.com/padraiglennon/common-file-generator/blob/main/design/ADR-012-word-generator-theming.md)).
+number, and a **theme**.
 
 ![The Generate a document tab](assets/screenshots/ui-doc.png)
 
